@@ -11,7 +11,7 @@ import json, gzip, os, sys, hashlib, collections, time, glob
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, ".."))
 from eval_paths import TWO_STAGE_POOL_DIR as T, TEXT_DECISIONS_DIR as DEC, HELDOUT3161_DIR as GD
-import e2e_ops as X
+import rescraper_ops as X
 OUT = sys.argv[1]; t0 = time.time()
 md5 = lambda s: hashlib.md5(s.encode("utf-8", "surrogatepass")).hexdigest()
 lid = {o["cid"]: o for o in map(json.loads, open(OUT + "/lid.jsonl"))}

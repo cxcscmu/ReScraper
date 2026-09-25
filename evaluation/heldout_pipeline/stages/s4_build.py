@@ -205,7 +205,7 @@ KEYS = ["rescraper", "ultrax", "proxc", "refinedweb_rule", "fineweb_rule"]
 kept = {k: [(g, text_of(k, g)) for g in range(N) if text_of(k, g) is not None] for k in KEYS}
 kept["resiliparse"] = [(p["gid"], p["resiliparse"]) for p in pages if nonempty(p["resiliparse"])]
 REPORT["kept_docs"] = {k: len(v) for k, v in kept.items()}
-SRC = {"rescraper": "released student (%s), executed with lib/e2e_ops.py" % DECODING,
+SRC = {"rescraper": "released student (%s), executed with lib/rescraper_ops.py" % DECODING,
        "ultrax": "UltraX run over the raw resiliparse pool (post/<stem>.parquet `cleaned`), row joined by exact text",
        "proxc": "gair-prox/web-chunk-refining-lm, settings of the pool ProX-C run (s2_proxc.py)",
        "refinedweb_rule": "DCLM dclm_baseline_refinedweb_post_lang.yaml mappers (s2_rw_rule.py)",

@@ -9,7 +9,7 @@ Extraction quality of ReScraper's `<extract>` step (Figure 8): token/line F1 aga
 - **HTML table** `html5k.jsonl` `{gid, html}` (picked up next to a 5,000-row page table; `HTML=` overrides).
 - **Student outputs**: one row per gid. `lib/common.py:load_student` accepts the `ours.jsonl` of the held-out pipeline
   (`text`, `decision`, `extracted`, `status`) or raw programs (`raw`), from which final text and pre-op extraction are
-  derived with `lib/e2e_ops.py`. The paper uses the release-decoding run, `heldout_pipeline/work/heldout5k_rel/ours.jsonl`.
+  derived with `lib/rescraper_ops.py`. The paper uses the release-decoding run, `heldout_pipeline/work/heldout5k_rel/ours.jsonl`.
   A row with `status != ok` (11 pages over the context) becomes decision `omitted`, empty extraction.
 
 ## A. Extraction vs Dripper (`extract_baselines.py`, `resiliparse_fill.py`, `ext_metrics.py`)

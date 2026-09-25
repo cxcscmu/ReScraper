@@ -1,4 +1,4 @@
-# ReScraper: End-to-End Scraping and Cleaning of Web Data for Effective LLM Pretraining
+# ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining
 
 Anonymous code release accompanying the ICLR 2027 submission. The trained model, the refined corpus and the SFT
 data will be released upon acceptance (referred to below as `<HF_ORG>/<MODEL>` and `<HF_ORG>/<DATASET>`).
@@ -15,7 +15,7 @@ rm A-B / rm A                         (lines that are not main content)
 payload                               <edit>: rm A-B / sub N: "s" (delete lines / strings); <rewrite>: new text
 ```
 
-A deterministic executor (`lib/e2e_ops.py`) applies the program to the rendered lines, so kept text is copied, not
+A deterministic executor (`lib/rescraper_ops.py`) applies the program to the rendered lines, so kept text is copied, not
 regenerated. The supervision is built from three teachers run in sequence on the same rendering: Dripper
 (main-content extraction -> `<extract>`), Qwen3.8-27B under a strict-subset refinement prompt (-> `<keep>`,
 `<edit>`, `<delete>`), and the RePro 1B rephraser for teacher-deleted pages whose FineWeb-Edu score is at least 1.0

@@ -6,7 +6,7 @@ usage: need960.py"""
 import sys, os, json
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, "..", ".."))
-import e2e_ops as X
+import rescraper_ops as X
 from eval_paths import HELDOUT3161_DIR, TWO_STAGE_POOL_DIR, HELDOUT960_DIR, HELDOUT960_STEM
 gold = [json.loads(l) for l in open(HELDOUT3161_DIR + "/sft_e2eC_gold_tagged.jsonl", encoding="utf-8")][:960]
 J = [json.loads(l) for l in open(HELDOUT960_DIR + "/heldout960_pooljoin.jsonl")]

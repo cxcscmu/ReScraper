@@ -18,7 +18,7 @@ env: INFER_MODEL_PATH, INFER_SYSTEM_PROMPT_FILE, INFER_OUT_DIR, ABLATION_RAW_DIR
 """
 import os, sys, json, gzip, re, time, signal, collections, hashlib
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X, editops as E, pool_join as H
+import rescraper_ops as X, editops as E, pool_join as H
 OUT = os.environ["INFER_OUT_DIR"]; MODEL = os.environ["INFER_MODEL_PATH"]
 SP = open(os.environ["INFER_SYSTEM_PROMPT_FILE"], encoding="utf-8").read().strip()
 RAWD = os.environ["ABLATION_RAW_DIR"]; SAVE_NINP = os.environ.get("ABLATION_SAVE_NINP", "") == "1"

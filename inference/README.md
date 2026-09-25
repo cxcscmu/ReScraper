@@ -4,11 +4,11 @@ Pool-scale refinement with the released model (paper Section 3.1 and Appendix A 
 
 | file | role |
 |---|---|
-| `infer_pool.py` | per rank: read Dripper step-1 records (raw HTML, `main_html` non-empty), render with the training renderer, number lines, generate with vLLM, execute the program (`lib/e2e_ops.body_from_prediction_dfirst`), write `{"text", "e2e_tag"}` rows per shard |
+| `infer_pool.py` | per rank: read Dripper step-1 records (raw HTML, `main_html` non-empty), render with the training renderer, number lines, generate with vLLM, execute the program (`lib/rescraper_ops.body_from_prediction_dfirst`), write `{"text", "e2e_tag"}` rows per shard |
 | `infer_pool.sbatch` | node-packed array launcher (8 ranks per node, `WORLD = 8 x nodes`), resumable per shard; `INFER_STEMS_FILE` backfills specific shards |
 | `postfilter.py`, `postfilter.sbatch` | drop malformed generations (`text/` -> `text_clean/`), with a shard-count gate |
 
-The deterministic executor lives in `lib/e2e_ops.py`: `<keep>` returns the rendered page minus the `<extract>` lines,
+The deterministic executor lives in `lib/rescraper_ops.py`: `<keep>` returns the rendered page minus the `<extract>` lines,
 `<edit>` additionally applies its `rm`/`sub` operations (an `<edit>` payload is read as operations only if every line
 parses as one), `<rewrite>` returns its payload, `<delete>` emits nothing. Provenance tags written to the corpus:
 `<extract>` (keep), `<refine>` (edit), `<rewrite>`.

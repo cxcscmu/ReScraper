@@ -11,7 +11,7 @@ reads  <ABL>/raw/<stem>_raw.jsonl.gz, <ABL>/full/text/<stem>_processed.jsonl.gz 
 writes <OUT>/text/<stem>_processed.jsonl.gz and <OUT>/meta/<stem>.json (atomic; a shard whose text + meta exist and
        whose text sha256 == meta sha256 is skipped = resumable per shard)
 
-Rule per generated page (the program is executed by a line-for-line mirror of e2e_ops.body_from_prediction_dfirst,
+Rule per generated page (the program is executed by a line-for-line mirror of rescraper_ops.body_from_prediction_dfirst,
 including its staged fallback, with ops1 = the <extract> block replaced by nothing):
   <keep>   -> apply_ops(ninp, "")          = the full rendering, lid markers stripped (executor's own apply_ops)
   <edit>   -> ops payload: _apply_edit_body(ninp, "", rest) = apply_ops(ninp, ops2) (edit ops only, original lids)
@@ -35,7 +35,7 @@ Checks:
 """
 import collections, gzip, hashlib, json, os, re, resource, signal, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X, editops as E, pool_join
+import rescraper_ops as X, editops as E, pool_join
 
 VERSION = "noext-v2"
 ST1 = pool_join.ST1
@@ -76,7 +76,7 @@ def md5(s): return hashlib.md5(s.encode("utf-8", "surrogatepass")).hexdigest()
 
 
 def run_program(ninp, pred, drop_ext):
-    """Line-for-line mirror of e2e_ops.body_from_prediction_dfirst (+ body_from_prediction_staged) that also returns
+    """Line-for-line mirror of rescraper_ops.body_from_prediction_dfirst (+ body_from_prediction_staged) that also returns
     the executor path. drop_ext=True executes the same program with ops1 (the <extract> block) = ""."""
     lines = pred.strip().split("\n")
     d = lines[0].strip() if lines else ""

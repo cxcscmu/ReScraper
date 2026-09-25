@@ -6,12 +6,12 @@ Page table (heldout5k schema, one JSON object per line, keyed by gid):
 HTML table: gid, html
 Student outputs (one row per gid; field names are matched flexibly, see load_student):
   raw program, final text, decision, pre-op extraction (heldout_pipeline/work/<tag>/ours.jsonl: text / decision /
-  extracted / status). Missing derived fields are recomputed from `raw` with lib/e2e_ops.py (decision-first staged format).
+  extracted / status). Missing derived fields are recomputed from `raw` with lib/rescraper_ops.py (decision-first staged format).
 """
 import json, os, re, sys, random, collections
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 import editops as E          # noqa: E402  (number_lines / apply_ops / OPS_RM / OPS_SUB)
-import e2e_ops as X          # noqa: E402  (parse_staged / body_from_prediction_dfirst)
+import rescraper_ops as X          # noqa: E402  (parse_staged / body_from_prediction_dfirst)
 
 # ---------------------------------------------------------------- text helpers
 TOK = re.compile(r"\w+")     # = the \w+ tokenisation of the fidelity-by-length analysis, applied to .lower()
@@ -56,7 +56,7 @@ def op(tag):
 DEC_LEAD = {"<keep>", "<edit>", "<delete>", "<rewrite>", "<clean>"}
 
 def student_extraction(raw, ninp):
-    """pre-op (stage-1) extraction of the end-to-end student: apply the <extract> block's line removals to the
+    """pre-op (stage-1) extraction of ReScraper: apply the <extract> block's line removals to the
     numbered input. Handles the decision-first format (line 1 = decision tag). None if there is no <extract> block."""
     ls = (raw or "").strip().split("\n")
     if ls and ls[0].strip() in DEC_LEAD and len(ls) > 1:

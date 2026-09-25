@@ -61,7 +61,7 @@ T=1 paraphrases are single samples and not bit-reproducible.
 `gid` (0..4999), `source`, `stem`, `step1_idx` (line of the Dripper step-1 shard), `in_md5` (md5 of the raw HTML =
 `html5k.jsonl`), `url`, `warc_id`, `input` (the numbered `<lid:n>` rendering the student reads), `drip` (Dripper text),
 `output` (teacher program, staged format), `tag` (keep/edit/delete/rewrite), `gfinal` (teacher final text =
-`e2e_ops.body_from_prediction_dfirst(input, output)`, empty for delete), `edu`, `edu_source`, `edu_recomputed`,
+`rescraper_ops.body_from_prediction_dfirst(input, output)`, empty for delete), `edu`, `edu_source`, `edu_recomputed`,
 `old_tag` (label before the relabel, rows < 3161), `paraphrase_source`, `pool_idx`, `pool_student_kept` (the two-stage
 refiner kept the page in the pool run), `resiliparse` (the pool resiliparse_extract text of the page, the input of every
 baseline), `resiliparse_join`, `resiliparse_row`; new-shard rows also carry `step2_row, cid, t27_tag, staged_kind,

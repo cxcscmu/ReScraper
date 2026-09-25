@@ -1,9 +1,9 @@
 """Execution and operation classification of one ReScraper program on its page (shared by the greedy run,
 stages/s1_ours_exec.py, and the release-decoding run, stages/s1_rel_exec.py).
 
-Per page (lib/e2e_ops.py + lib/editops.py, the executor of the pool writer):
+Per page (lib/rescraper_ops.py + lib/editops.py, the executor of the pool writer):
   decision  = line 1 of the raw program (<keep>/<edit>/<delete>/<rewrite>; anything else = unparseable)
-  pt, body  = e2e_ops.body_from_prediction_dfirst(input, raw)       (the decision-first reader)
+  pt, body  = rescraper_ops.body_from_prediction_dfirst(input, raw)       (the decision-first reader)
   text      = "" if pt == <delete> else body
   extracted = editops.apply_ops(input, ops1), ops1 = parse_staged(lines[1:])[0]   (pre-op extraction; the "before"
               text of the operation-score groups and of the operation mix)

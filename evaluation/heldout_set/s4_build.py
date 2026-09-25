@@ -10,13 +10,13 @@ rows 960..3160  rest of the 3,161-page staged table ($HELDOUT3161_DIR/sft_e2eC_g
                 step 3c), else <delete>. edu = rescue_add/text_decisions value of the pool page joined by exact Dripper
                 text, else recomputed.
 rows 3161..4999 two new held-out pool shards: Qwen3.8-27B strict-subset label (the SFT teacher's prompt/decoding) -> tag
-                by the SFT builder's rule -> e2e_ops.to_staged_row -> same edu1 relabel; taken in (shard draw order,
+                by the SFT builder's rule -> rescraper_ops.to_staged_row -> same edu1 relabel; taken in (shard draw order,
                 step-2 row) order until 5,000.
 usage: s4_build.py <workdir> <outdir>"""
 import sys, json, re, collections, hashlib, os, glob
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, ".."))
-import e2e_ops as X
+import rescraper_ops as X
 import editops as E
 from render import webkit_post     # the SFT builder's webkit_post, verbatim
 from eval_paths import HELDOUT3161_DIR, HELDOUT960_DIR, TWO_STAGE_POOL_DIR, HELDOUT960_STEM

@@ -1,6 +1,6 @@
 """Stage 1b (CPU): execute the student programs of the greedy run and score them against the teacher.
 
-Execution and operation classes: lib/ours_exec.py (execute / classify_ours; lib/e2e_ops.py + lib/editops.py, the
+Execution and operation classes: lib/ours_exec.py (execute / classify_ours; lib/rescraper_ops.py + lib/editops.py, the
 executor of the pool writer). Teacher comparison: evaluation/fidelity/teacher_metrics.py (decision accuracy over pages
 sent to the model; token P/R/F1 = corpus-level \\w+ token-mass overlap of pfinal vs gfinal, deleted -> "", on pages with
 plen + tlen <= 32768; 95% CIs from 2,000 page-bootstrap resamples).

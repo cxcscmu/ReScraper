@@ -1,4 +1,4 @@
-"""Staged edit-op format for the end-to-end text cleaner: the model sees the numbered full-page text and
+"""Staged edit-op format for the ReScraper model: the model sees the numbered full-page text and
 emits (1) an <extract> block = dripper line removals, then (2) the 27B/rewrite decision on the same
 line ids: <keep> | <edit> + ops | <delete> | <rewrite> + text. Both stages use the original ids, so
 the reader just applies the union of the ops. Each stage can be scored on its own."""

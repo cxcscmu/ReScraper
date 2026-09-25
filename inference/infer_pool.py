@@ -7,7 +7,7 @@ were rendered from, so no content alignment is needed.
 Per shard: render the raw HTML with the training renderer (webkit_txt, 60 s timeout, pages under 20 characters
 dropped), number the lines (<lid:n>), skip prompts over 32,768 - 3,072 = 29,696 tokens, generate with
 T=1.0 / top-p 1.0 / 3,072 new tokens / thinking disabled (vLLM, bf16, prefix caching), execute the program with
-lib/e2e_ops.body_from_prediction_dfirst, drop <delete> and empty pages, and write {"text", "e2e_tag"} rows to
+lib/rescraper_ops.body_from_prediction_dfirst, drop <delete> and empty pages, and write {"text", "e2e_tag"} rows to
 $INFER_OUT_DIR/<stem>_processed.jsonl.gz (atomic, resumable per shard).
 usage: infer_pool.py <rank> <world>
 env: INFER_MODEL_PATH (the Stage-2 checkpoint), INFER_SYSTEM_PROMPT_FILE (prompts/student_system_stage2.txt),
@@ -16,7 +16,7 @@ env: INFER_MODEL_PATH (the Stage-2 checkpoint), INFER_SYSTEM_PROMPT_FILE (prompt
 """
 import os, sys, json, gzip, re, time, signal, collections
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
-import e2e_ops as X, editops as E, pool_join as H
+import rescraper_ops as X, editops as E, pool_join as H
 OUT = os.environ["INFER_OUT_DIR"]; MODEL = os.environ["INFER_MODEL_PATH"]
 SP = open(os.environ["INFER_SYSTEM_PROMPT_FILE"], encoding="utf-8").read().strip()
 MAX_LEN = 32768; MAX_NEW = 3072; MAX_PROMPT = MAX_LEN - MAX_NEW

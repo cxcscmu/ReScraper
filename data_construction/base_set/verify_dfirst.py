@@ -4,7 +4,7 @@ dfirst(new target) == staged(old target), plus an rwstrict scan of the rewrite b
 usage: verify_dfirst.py <staged.jsonl> <dfirst.jsonl> [n_sample=4000]"""
 import json, os, sys, random, collections
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X, rwstrict
+import rescraper_ops as X, rwstrict
 
 src, dst = sys.argv[1], sys.argv[2]
 N = int(sys.argv[3]) if len(sys.argv) > 3 else 4000

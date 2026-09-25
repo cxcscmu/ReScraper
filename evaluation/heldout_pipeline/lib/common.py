@@ -11,7 +11,7 @@ import gzip, hashlib, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 EVAL = os.path.abspath(os.path.join(HERE, "..", ".."))
 REPO = os.path.abspath(os.path.join(EVAL, ".."))
-LIB_E2E = os.path.join(REPO, "lib")                   # e2e_ops.py + editops.py (the executor of the pool writer)
+LIB_E2E = os.path.join(REPO, "lib")                   # rescraper_ops.py + editops.py (the executor of the pool writer)
 if EVAL not in sys.path:
     sys.path.insert(0, EVAL)
 from eval_paths import HELDOUT_PIPELINE_DIR as HP      # noqa: E402
@@ -84,8 +84,8 @@ OPNAME = {"<extract>": "keep", "<keep>": "keep", "<refine>": "edit", "<edit>": "
 
 
 def e2e():
-    """(e2e_ops, editops) modules from lib/."""
+    """(rescraper_ops, editops) modules from lib/."""
     if LIB_E2E not in sys.path:
         sys.path.insert(0, LIB_E2E)
-    import e2e_ops as X, editops as E
+    import rescraper_ops as X, editops as E
     return X, E

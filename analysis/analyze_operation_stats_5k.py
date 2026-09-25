@@ -7,7 +7,7 @@ top_p=1.0, max_tokens=3072); the 11 pages the release run never sent to the mode
 left out (4,989 programs). The teacher programs of the same pages ($WORK_DIR/eval/heldout5k/heldout5k.jsonl
 `output`, same serialization) are measured with the same code as a reference.
 
-Program grammar (decision-first staged format, lib/e2e_ops.py): line 1 = decision; "<extract>";
+Program grammar (decision-first staged format, lib/rescraper_ops.py): line 1 = decision; "<extract>";
 the extractor's removals; the repeated decision; the payload (edit ops for <edit>, text for <rewrite>).
 Ops: "rm A" / "rm A-B" remove whole input lines (1-based, inclusive); "sub N: \"s\"" removes substring s
 from line N. Lines = the non-empty lines of the numbered input, as the executor (editops.apply_ops) counts them.
@@ -37,7 +37,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
-import e2e_ops as X  # noqa: E402
+import rescraper_ops as X  # noqa: E402
 import editops as E  # noqa: E402
 
 HERE = Path(__file__).resolve().parent  # analysis/

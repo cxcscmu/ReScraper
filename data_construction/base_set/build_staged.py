@@ -1,4 +1,4 @@
-"""Compose the serialized two-stage target for every joined seed page (lib/e2e_ops.to_staged_row):
+"""Compose the serialized two-stage target for every joined seed page (lib/rescraper_ops.to_staged_row):
     <extract>\n{rm a-b lines Dripper removed}\n<keep> | <edit>\n{rm/sub ops} | <delete> | <rewrite>\n{text}
 Stage 1 (<extract>) = the lines of the rendered page that Dripper dropped (rows whose Dripper text is not an exact
 line subset of the rendering are dropped: stage1_not_subset / stage1_has_sub / stage1_len_mismatch). Stage 2 =
@@ -8,7 +8,7 @@ usage: build_staged.py <dir with join_*.jsonl> <out.jsonl>
 """
 import json, glob, collections, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X
+import rescraper_ops as X
 
 D, dst = sys.argv[1], sys.argv[2]
 rows = [json.loads(l) for f in sorted(glob.glob(D + "/join_*.jsonl")) for l in open(f, encoding="utf-8")]

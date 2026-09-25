@@ -16,7 +16,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, ".."))
 from eval_paths import (SFT_DATA_DIR as D, HELDOUT3161_DIR as GD, TWO_STAGE_POOL_DIR as T, TEXT_DECISIONS_DIR as DEC,
                         POOL_SIMP_DIR as SIMP, POOL_RAW_DIR as RAW, TWO_STAGE_SFT_SOURCE_GLOB)
-import e2e_ops as X, editops as E, pool_join as H, render
+import rescraper_ops as X, editops as E, pool_join as H, render
 ST1 = H.ST1
 OUT = sys.argv[1]; os.makedirs(OUT, exist_ok=True)
 md5 = lambda s: hashlib.md5(s.encode("utf-8", "surrogatepass")).hexdigest()

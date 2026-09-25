@@ -8,7 +8,7 @@ usage: join_pool960.py"""
 import sys, os, json, glob, gzip, collections
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, "..", ".."))
-import e2e_ops as X
+import rescraper_ops as X
 from eval_paths import HELDOUT3161_DIR, TWO_STAGE_POOL_DIR, TEXT_DECISIONS_DIR, HELDOUT960_DIR, HELDOUT960_STEM
 T, STEM = TWO_STAGE_POOL_DIR, HELDOUT960_STEM
 os.makedirs(HELDOUT960_DIR, exist_ok=True)

@@ -26,7 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import editops as E  # noqa: E402
-from e2e_ops import parse_staged  # noqa: E402
+from rescraper_ops import parse_staged  # noqa: E402
 
 HERE = Path(__file__).resolve().parent  # analysis/
 DATA_DIR = Path(os.environ.get("FIG_DATA_DIR", HERE / "data"))

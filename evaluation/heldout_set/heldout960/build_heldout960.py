@@ -11,7 +11,7 @@ refiner kept them, so the SFT build never scored them) get the same classifier o
 (edu_heldout960_recomputed.jsonl; matches text_decisions on 373/374 overlapping pages, max |diff| 0.001).
 Paraphrase = two_stage_pool/rwrepro_olmo_temp1 (the SFT's rewrite source) at the page's pool index; pages with none
 there use gen_repro_t1_out.jsonl (same script/settings, generated for just those pages).
-The row format is e2e_ops.to_staged_row's: <extract> head unchanged, then "<delete>" or "<rewrite>\\n<text>".
+The row format is rescraper_ops.to_staged_row's: <extract> head unchanged, then "<delete>" or "<rewrite>\\n<text>".
 Rows are joined to the pool by exact Dripper text (render `drip` == two_stage_pool/input text); the render `row`
 field does not index two_stage_pool/input.
 
@@ -20,7 +20,7 @@ usage: build_heldout960.py <out_staged.jsonl> <out_val_idx.json> <audit.jsonl>
 import sys, os, json, collections
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, "..", ".."))
-import e2e_ops as X
+import rescraper_ops as X
 import editops as E
 from eval_paths import HELDOUT3161_DIR, TWO_STAGE_POOL_DIR, HELDOUT960_DIR, HELDOUT960_STEM
 

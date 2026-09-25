@@ -3,7 +3,7 @@ P/R/F1 of the text each page contributes (deleted pages -> ""), 95% page-bootstr
 confusion, and the decision flow of the Sankey figure.
 
 Conventions (as the held-out evaluation of the SFT runs):
-  gt, gbody = e2e_ops.body_from_prediction_dfirst(input, teacher output)   (teacher tag: <extract>/<refine>/<delete>/<rewrite>)
+  gt, gbody = rescraper_ops.body_from_prediction_dfirst(input, teacher output)   (teacher tag: <extract>/<refine>/<delete>/<rewrite>)
   pt, pbody = the executed student program (same reader)
   decision accuracy over the pages sent to the model; token P/R/F1 = corpus-level overlap of lower-cased \\w+ token
   multisets of pfinal vs gfinal (deleted -> ""), on pages whose prompt + teacher target fit the 32,768-token context
@@ -12,7 +12,7 @@ Conventions (as the held-out evaluation of the SFT runs):
 import collections, os, random, re, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X  # noqa: E402
+import rescraper_ops as X  # noqa: E402
 
 TOK = re.compile(r"\w+")
 MAXLEN = 32768

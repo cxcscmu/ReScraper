@@ -3,7 +3,7 @@ by the SFT chain (the join the released student's SFT rows went through):
   Dripper step-2 text row k -> step-1 record (ordered, head check within 4, pool_join.head_in) -> drip =
   webkit_txt(main_html) must equal the step-2 text; full = webkit_txt(step-1 input html) (60 s alarm, len >= 20).
 Seed filter as the SFT seed sampler: text = webkit_post(step-2 text); drop empty / MARKUP (LID en >= 0.65 is applied in
-step 2b, fastText lives in the DCLM data-processing env). Stage-1 feasibility = e2e_ops.to_staged_row(full, drip,
+step 2b, fastText lives in the DCLM data-processing env). Stage-1 feasibility = rescraper_ops.to_staged_row(full, drip,
 "<delete>") is not None (the staged builder drops these rows anyway).
 Excluded shards: the stage-1 SFT shards of the released student (STAGE1_SFT_STEMS, 1,109 stems), 2 known-bad pool
 shards, the shards holding any page of the two-stage refiner's SFT source (step 1b), the 3 existing held-out shards,
@@ -13,7 +13,7 @@ import json, gzip, os, sys, re, signal, hashlib, collections, random, ast, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, ".."))
 from eval_paths import TWO_STAGE_POOL_DIR as T, TEXT_DECISIONS_DIR as DEC, POOL_RAW_DIR as RAW, STAGE1_SFT_STEMS
-import e2e_ops as X, editops as E, pool_join as H, render as B
+import rescraper_ops as X, editops as E, pool_join as H, render as B
 OUT, T2T_STEMS, T2T_WARC, SEED = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
 md5 = lambda s: hashlib.md5(s.encode("utf-8", "surrogatepass")).hexdigest()
 def meta(m):

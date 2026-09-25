@@ -8,7 +8,7 @@ Teacher fidelity of ReScraper on the held-out pages: how closely the 0.6B studen
 | `teacher_metrics.py` | library used by the held-out pipeline (`heldout_pipeline/stages/s1_ours_exec.py`, `s1_rel_exec.py`): `teacher_metrics()` (decision accuracy over 4 operations and keep-or-delete accuracy over the pages sent to the model; pooled token P/R/F1 = overlap of lower-cased `\w+` token multisets of the text each page contributes, deleted pages -> `""`, on pages whose prompt + teacher target fit the 32,768-token context; 95% CIs from 2,000 page-bootstrap resamples; 4x4 confusion), `rows_for()` / `rows_from_executed()` (teacher vs student text per page), `decision_flow()` (teacher operation x student operation over all pages; skipped / unparseable pages count as delete) |
 | `score_fidelity.py` | stand-alone CLI on a page table + an executed `ours.jsonl`: `python score_fidelity.py heldout5k.jsonl work/heldout5k_rel/ours.jsonl fidelity.json` |
 
-Teacher text per page = `lib/e2e_ops.body_from_prediction_dfirst(input, output)` of the teacher program (`gfinal`);
+Teacher text per page = `lib/rescraper_ops.body_from_prediction_dfirst(input, output)` of the teacher program (`gfinal`);
 student text = the executor output of its program (`text`); both are `""` for `<delete>`.
 
 On the release-decoding run (4,989 of 5,000 pages sent, 3 of them too long for a token score) this gives decision

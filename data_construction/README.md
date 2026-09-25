@@ -20,7 +20,7 @@ DCLM pool shard (raw HTML)
                                      rewrite raised to 30% by subsampling the other operations)
 ```
 
-Target format (decision-first, `lib/e2e_ops.py`):
+Target format (decision-first, `lib/rescraper_ops.py`):
 ```
 <keep>|<edit>|<delete>|<rewrite>     line 1: the operation
 <extract>                            line 2, always literal

@@ -25,7 +25,7 @@ Checks (any failure -> exit 3, message BUILD_FAIL):
   F4  every arm, read back from disk: rows without ablation_from == full rows minus the arm's target-tag pages (in
       order), rows with ablation_from == the non-empty extracted texts of the target-tag pages (in order)
   --smoke (raw rows carry ninp):
-  S1  the UNMODIFIED release loop re-run on (ninp, gen) with e2e_ops.body_from_prediction_dfirst writes exactly
+  S1  the UNMODIFIED release loop re-run on (ninp, gen) with rescraper_ops.body_from_prediction_dfirst writes exactly
       the full/text bytes, and reproduces every raw (tag, final)
   S2  extracted == what the UNMODIFIED executor returns for the same generation with its decision line set to <keep>
   SMOKE gate: class mix within broad bounds of the release, <=2% malformed, full-arm rows within 15% of the
@@ -33,7 +33,7 @@ Checks (any failure -> exit 3, message BUILD_FAIL):
 """
 import collections, gzip, json, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
-import e2e_ops as X, editops as E
+import rescraper_ops as X, editops as E
 
 ARMS = {"nodel": "<delete>", "noedit": "<refine>", "norw": "<rewrite>"}
 STD = ("<extract>", "<refine>", "<rewrite>", "<delete>")

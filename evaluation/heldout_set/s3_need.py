@@ -9,7 +9,7 @@ import json, os, sys, glob, collections
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "lib")); sys.path.insert(0, os.path.join(HERE, ".."))
 from eval_paths import HELDOUT3161_DIR as GD
-import e2e_ops as X
+import rescraper_ops as X
 W = sys.argv[1]
 gold = [json.loads(l) for l in open(GD + "/sft_e2eC_gold_tagged.jsonl", encoding="utf-8")]
 rows = [json.loads(l) for f in sorted(glob.glob(GD + "/render_*.jsonl")) for l in open(f, encoding="utf-8")]
