@@ -1,0 +1,34 @@
+You are evaluating a main-content extractor for web pages.
+
+You will see two texts.
+PAGE: the full visible text of one web page as rendered from its HTML, one block per line. It contains the page's main content and all of its boilerplate: navigation menus, headers, footers, sidebars, advertisements, cookie notices, share buttons, login or search widgets, lists of related or recommended links, tag clouds, comment forms.
+EXTRACTION: the text an extractor returned as the main content of this page.
+
+The main content is the material the page exists to present: the article or blog post with its title, the forum thread or Q&A, the product or service description, the recipe, the documentation, the entries of a listing, and so on, together with the tables, lists, captions, code and bylines that belong to it. Everything else is boilerplate. User comments are main content on discussion pages (forums, Q&A). On an article or blog post, reader comments are optional: their absence does not lower recall and their presence does not lower precision, but comment forms and prompts such as "Leave a reply" are boilerplate.
+
+Judge only how well EXTRACTION isolates the main content of this page. Do not judge whether the page is useful, well written or worth keeping. Differences in line breaks, bullet characters, list markers, table separators or whitespace are not errors. EXTRACTION may contain text that is not visible in PAGE (for example from hidden page elements); count it as boilerplate unless it clearly belongs to the main content. If a text ends with "[... truncated for length]", the rest of it was not shown to you: do not penalize anything you cannot see, and do not treat that cut as a defect of the extraction.
+
+First identify the main content of PAGE. Then score three dimensions, each 0, 1 or 2.
+
+main_content_recall: is all of the main content in EXTRACTION?
+  2 = all of it, or all but trivial pieces (a date, a byline, a single caption).
+  1 = most of it, but a noticeable part is missing (the title, a section, several paragraphs, a table, or the end of the text).
+  0 = most or all of it is missing, or EXTRACTION holds the wrong part of the page (only menus, a sidebar or a teaser), or EXTRACTION is empty although the page has main content.
+  If PAGE has no main content at all (a login form, an error page, a bare list of navigation links), score 2.
+
+boilerplate_precision: is the boilerplate left out?
+  2 = no boilerplate, or at most one or two short stray lines (a breadcrumb, "Share this").
+  1 = some boilerplate remains (part of a menu, a footer or copyright block, a cookie notice, a list of related links or tags), but main content still makes up most of EXTRACTION.
+  0 = boilerplate makes up a large part of EXTRACTION (full navigation menus, footers, ad text, link lists), or EXTRACTION is mostly or entirely boilerplate.
+  An empty EXTRACTION scores 2 (it contains no boilerplate).
+
+integrity: is the text in EXTRACTION intact and readable?
+  2 = clean text: no garbled characters or markup residue, no sentence or block cut off in the middle, no repeated blocks; paragraphs are separated, and lists, tables and code stay readable (for example one item or row per line).
+  1 = minor defects: a few merged words or run-together blocks, one list or table flattened into a hard-to-read line, a repeated line, a few markup or encoding artifacts, or one truncated sentence.
+  0 = severe defects: much of the text is garbled, full of markup, duplicated or cut off, or its tables, lists or code are unreadable.
+  An empty EXTRACTION scores 2 (it has no defects; missing content is scored only under recall).
+
+The three dimensions are independent. An extraction that keeps the whole page scores high on recall and low on precision; an empty extraction of a page that has main content scores 0 on recall and 2 on the other two.
+
+Reply with only a JSON object that ends with a one-sentence rationale:
+{"main_content_recall": n, "boilerplate_precision": n, "integrity": n, "rationale": "<one sentence>"}

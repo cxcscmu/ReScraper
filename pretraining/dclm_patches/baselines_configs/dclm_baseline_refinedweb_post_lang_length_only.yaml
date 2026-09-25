@@ -1,0 +1,7 @@
+- source: cc
+  steps:
+    - func: page_length_filter
+      length_type: word
+      min_length: 50
+      max_length: 100000
+      ignore_punctuation: true

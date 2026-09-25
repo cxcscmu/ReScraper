@@ -1,0 +1,7 @@
+# Extra tools of the baselines and the held-out evaluation (install into the environment that runs each step;
+# see the directory READMEs). FineWeb-rule needs its own environment with exactly datatrove 0.2.0 (the FineWeb
+# release version; its C4 / Gopher / FineWeb filters plus the fastText lid.176 language filter).
+datatrove==0.2.0
+resiliparse==0.16.0
+trafilatura==2.0.0
+jusText==3.0.2

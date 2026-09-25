@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+logs/
+configs/paths.env
+analysis/data/
+analysis/figures/

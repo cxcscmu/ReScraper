@@ -1,0 +1,786 @@
+diff --git a/baselines/baselines_configs/dclm_baseline_refinedweb_lang_only.yaml b/baselines/baselines_configs/dclm_baseline_refinedweb_lang_only.yaml
+new file mode 100644
+index 0000000..06be5b5
+--- /dev/null
++++ b/baselines/baselines_configs/dclm_baseline_refinedweb_lang_only.yaml
+@@ -0,0 +1,31 @@
++- source: cc
++  steps:
++  - func: move_url_modifier
++  - func: url_substring_filter
++    banlist_from_fname: baselines/mappers/banlists/refinedweb_banned_domains_curated.txt
++    exact_domain_match: true
++    ignore_chars:
++    - www
++  - func: url_substring_filter
++    banlist_from_fname: baselines/mappers/banlists/refinedweb_banned_words_strict_reverse_engineered.txt
++    ignore_chars:
++    - '-'
++    - .
++  - func: url_substring_filter
++    banlist_from_fname: baselines/mappers/banlists/refinedweb_banned_words_hard_reverse_engineered.txt
++    match_substrings: false
++  - func: url_substring_filter
++    banlist_from_fname: baselines/mappers/banlists/refinedweb_banned_words_soft_reverse_engineered.txt
++    num_banned_substrs: 2
++    match_substrings: false
++  - func: url_removal_modifier
++  - func: newline_removal_modifier
++    max_consecutive: 2
++  - func: detect_lang_whole_page_enricher
++    model: fasttext
++    key_prefix: language_id_whole_page
++  - func: language_filter
++    key: language_id_whole_page_fasttext
++    keep_languages:
++    - en
++    threshold: 0.65
+diff --git a/baselines/baselines_configs/dclm_baseline_refinedweb_post_lang.yaml b/baselines/baselines_configs/dclm_baseline_refinedweb_post_lang.yaml
+new file mode 100644
+index 0000000..ee5239e
+--- /dev/null
++++ b/baselines/baselines_configs/dclm_baseline_refinedweb_post_lang.yaml
+@@ -0,0 +1,48 @@
++- source: cc
++  steps:
++  - func: page_length_filter
++    length_type: word
++    min_length: 50
++    max_length: 100000
++    ignore_punctuation: true
++  - func: word_length_filter
++    min_length: 3
++    max_length: 10
++  - func: symbol_ratio_filter
++    max_symbol_to_word_ratio: 0.1
++  - func: bullet_count_filter
++    max_bullet_start_ratio: 0.9
++  - func: ellipsis_count_filter
++    max_ellipsis_end_ratio: 0.3
++  - func: alphabetic_word_ratio_filter
++    max_ratio: 0.2
++  - func: stop_word_filter
++    count_unique: false
++    min_stop_word: 2
++  - func: massive_web_repetition_filters
++  - func: word_counter_enricher
++    key: previous_word_count
++  - func: uppercase_ratio_line_modifier
++    max_ratio: 0.5
++  - func: numeric_ratio_line_modifier
++    max_ratio: 0.999999
++  - func: counter_line_modifier
++  - func: line_length_modifier
++    min_length: 2
++  - func: substring_line_modifier
++    max_length: 10
++    banlist: items in cart
++    remove_substring_only: true
++  - func: substring_line_modifier
++    max_length: 10
++    banlist: Read more...
++    location: suffix
++    remove_substring_only: true
++  - func: substring_line_modifier
++    max_length: 10
++    banlist: Sign-in
++    location: prefix
++    remove_substring_only: true
++  - func: word_removal_ratio_filter
++    prev_word_count_key: previous_word_count
++    max_removed_ratio: 0.05
+diff --git a/baselines/baselines_configs/resiliparse_extract.yaml b/baselines/baselines_configs/resiliparse_extract.yaml
+new file mode 100644
+index 0000000..49dc002
+--- /dev/null
++++ b/baselines/baselines_configs/resiliparse_extract.yaml
+@@ -0,0 +1,3 @@
++- source: cc
++  steps:
++    - func: resiliparse_extraction_modifier
+diff --git a/baselines/core/monitoring.py b/baselines/core/monitoring.py
+new file mode 100644
+index 0000000..5f7d39b
+--- /dev/null
++++ b/baselines/core/monitoring.py
+@@ -0,0 +1,10 @@
++class MonitorScorer:
++    pass
++
++class FilterMonitor:
++    def __init__(self, *args, **kwargs):
++        pass
++
++class FilterRecorder:
++    def __init__(self, *args, **kwargs):
++        pass
+diff --git a/baselines/mappers/modifiers.py b/baselines/mappers/modifiers.py
+index 827da17..0ed168a 100644
+--- a/baselines/mappers/modifiers.py
++++ b/baselines/mappers/modifiers.py
+@@ -414,6 +414,35 @@ def html_content_extraction_modifier(page: Dict) -> List[Dict]:
+     return []
+ 
+ 
++def resiliparse_extraction_modifier(page: Dict,
++                                    html_key: str = 'text',
++                                    out_key: str = 'text',
++                                    main_content: bool = True,
++                                    alt_texts: bool = False,
++                                    preserve_formatting: bool = True) -> List[Dict]:
++    """Replace raw HTML in `html_key` with Resiliparse-extracted plain text under
++    `out_key`. All other keys (e.g. metadata, warcinfo) pass through untouched.
++    Drops records whose extraction is empty."""
++    from resiliparse.extract.html2text import extract_plain_text
++    from resiliparse.parse.html import HTMLTree
++
++    html = page.get(html_key)
++    if not html:
++        return []
++    try:
++        tree = HTMLTree.parse(html)
++        text = extract_plain_text(tree,
++                                  main_content=main_content,
++                                  alt_texts=alt_texts,
++                                  preserve_formatting=preserve_formatting)
++    except Exception:
++        return []
++    if not text or not text.strip():
++        return []
++    page[out_key] = text
++    return [page]
++
++
+ @factory_function
+ def substring_line_modifier(banlist: Union[str, List], case_sensitive=False,
+                             location='any', max_length=None, remove_substring_only=False) -> List[Dict]:
+diff --git a/eval/eval_openlm_ckpt.py b/eval/eval_openlm_ckpt.py
+index b4a5cba..f9d5309 100644
+--- a/eval/eval_openlm_ckpt.py
++++ b/eval/eval_openlm_ckpt.py
+@@ -518,8 +518,8 @@ def main():
+     args.resume = args.checkpoint
+     args.remote_sync = args.output_file
+     directory = os.path.dirname(args.output_file)
+-    if directory != "" and not os.path.exists(directory):
+-        os.makedirs(directory)
++    if directory != "":
++        os.makedirs(directory, exist_ok=True)
+ 
+     CWD = os.getcwd()
+     if args.use_temp_working_dir:
+@@ -538,7 +538,7 @@ def main():
+         eval_model = OpenLMforCausalLM(OpenLMConfig(params))
+ 
+     if "gpt-neox-20b" in args.tokenizer:
+-        tokenizer = GPTNeoXTokenizerFast.from_pretrained("EleutherAI/gpt-neox-20b")
++        tokenizer = GPTNeoXTokenizerFast.from_pretrained(args.tokenizer)
+     elif "llama" in args.tokenizer:
+         tokenizer = LlamaTokenizerFast.from_pretrained(args.tokenizer)
+         if len(tokenizer) > eval_model.config.vocab_size:  # happens in llama-3-8b
+diff --git a/ray_processing/process_no_ray.py b/ray_processing/process_no_ray.py
+new file mode 100644
+index 0000000..72d1ff1
+--- /dev/null
++++ b/ray_processing/process_no_ray.py
+@@ -0,0 +1,443 @@
++#!/usr/bin/env python3
++import argparse
++import importlib
++import boto3
++import json
++import os
++import pathlib
++import time
++import traceback
++import warnings
++from typing import Optional
++
++from tqdm import tqdm
++from yaml import safe_load
++
++import sys
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++
++from baselines.core import process_single_file
++from baselines.core.monitoring import FilterMonitor, MonitorScorer, FilterRecorder
++from ray_processing.utils import generate_untokenized_dataset_json, get_source_ref, get_source_ref_by_key
++from baselines.core.constants import GLOBAL_FUNCTIONS
++
++
++LOCAL_CHUNK = "local"
++
++
++def _load_builder(builder_path: str):
++    if ":" not in builder_path:
++        raise ValueError(f"Builder path '{builder_path}' must be of the form 'module.submodule:callable'.")
++    module_name, attr_name = builder_path.split(":", 1)
++    module = importlib.import_module(module_name)
++    builder = getattr(module, attr_name)
++    return builder
++
++
++def build_monitor_from_spec(monitor_spec, jsonl_relpath: str) -> FilterMonitor:
++    print("inside build_monitor_from_spec")
++    if monitor_spec is None:
++        return None
++    print("monitor:", monitor_spec)
++    spec = dict(monitor_spec)
++    output_dir = pathlib.Path(spec["output_dir"])
++    shard_name = os.path.splitext(os.path.basename(jsonl_relpath))[0]
++    shard_output_dir = output_dir / shard_name
++
++    scorers = []
++    for scorer_cfg in spec.get("scorers", []):
++        print("scorer", scorer_cfg)
++        builder_path = scorer_cfg.get("builder")
++        if builder_path is None:
++            raise ValueError("Each scorer entry must provide a 'builder' field.")
++        builder = _load_builder(builder_path)
++        params = scorer_cfg.get("params", {}) or {}
++        scorer = builder(**params)
++        if not isinstance(scorer, MonitorScorer):
++            raise TypeError(f"Builder '{builder_path}' did not return a MonitorScorer instance.")
++        scorers.append(scorer)
++
++    return FilterMonitor(
++        scorers=scorers,
++        output_dir=shard_output_dir,
++        sample_size=spec.get("sample_size", 128),
++        text_key=spec.get("text_key", "text"),
++        rng_seed=spec.get("rng_seed"),
++    )
++
++
++def build_recorder(base_dir: pathlib.Path, jsonl_relpath: str) -> FilterRecorder:
++    shard_name = os.path.splitext(os.path.basename(jsonl_relpath))[0]
++    return FilterRecorder(base_dir, shard_name)
++
++
++def parse_args():
++    parser = argparse.ArgumentParser()
++    parser.add_argument(
++        "--source_ref_paths", type=str, nargs="+", help="Paths to untokenized dataset refs (comma or space separated)."
++    )
++    parser.add_argument(
++        "--raw_data_dirpath",
++        help="Path to the top data directory in the data hierarchy (from which to mirror the output path).",
++    )
++    parser.add_argument("--shard_list_file", type=str, default=None, help="File containing list of input shards.")
++    parser.add_argument(
++        "--shard_list_filters", type=str, nargs="+", help="List of substrings to filter the input shard list by."
++    )
++
++    parser.add_argument("--output_dir", required=True, help="Path to the output dir of the processed file.")
++    parser.add_argument(
++        "--readable_name", required=True, type=str, help="Name given to tokenized dataset and reference json."
++    )
++
++    parser.add_argument(
++        "--config_path",
++        default="baselines/baselines_configs/c4.yaml",
++        help="Path to the YAML file specifying the baseline.",
++    )
++    parser.add_argument(
++        "--source_name", type=str, default="dcnlp_beta_pool", help="The name of the source of the jsonl file."
++    )
++    parser.add_argument(
++        "--workers", type=int, default=1, help="If > 1, process_single_file will fan out across a process pool."
++    )
++    parser.add_argument("--overwrite", action="store_true", help="Overwrite results even if they already exist.")
++    parser.add_argument("--num_shards", type=int, default=None, help="Only run on the first N shards (for debugging).")
++
++    # NEW: range-based sharding for multi-node parallelism
++    parser.add_argument(
++        "--shard_start",
++        type=int,
++        default=0,
++        help="0-based index of the first shard to process after listing + filtering.",
++    )
++    parser.add_argument(
++        "--shard_count",
++        type=int,
++        default=None,
++        help="Number of shards to process starting from shard_start. If None, process all remaining shards.",
++    )
++
++    parser.add_argument(
++        "--ignore_failures", action="store_true", help="Skip steps if there are partial failures (use sparingly)."
++    )
++    parser.add_argument(
++        "--monitor_config",
++        type=str,
++        default=None,
++        help="Optional YAML file specifying per-filter quality monitoring (scorers, sample size, output).",
++    )
++    parser.add_argument(
++        "--filter_io_dump_dir",
++        type=str,
++        default=None,
++        help=(
++            "Directory for storing per-filter before/after JSONL snapshots. "
++            "If relative, resolved under the pipeline output directory. Defaults to "
++            "'<output_dir>/<config_name>/filter_snapshots/<readable_name>'."
++        ),
++    )
++
++    # NEW: option to disable filter snapshots entirely (only final outputs)
++    parser.add_argument(
++        "--disable_filter_io_dump",
++        action="store_true",
++        help="If set, do NOT write per-filter before/after JSONL snapshots; only final per-shard outputs are saved.",
++    )
++
++    # NEW: helpful for multi-node runs; avoid metadata write races
++    parser.add_argument(
++        "--skip_dataset_metadata",
++        action="store_true",
++        help="If set, skip writing exp_data/datasets/untokenized/<readable_name>.json.",
++    )
++
++    return parser.parse_args()
++
++
++def list_shard_files(
++    data_dirpath,
++    num_shards: Optional[int] = None,
++    shard_list_file: Optional[str] = None,
++    shard_list_filters=None,
++    shard_start: int = 0,
++    shard_count: Optional[int] = None,
++):
++    print("inside list_shard")
++    if shard_list_file is not None:
++        with open(shard_list_file, "r") as f:
++            shard_files = f.read().splitlines()
++    elif data_dirpath is not None:
++        # Check if it's a local path or S3 path
++        if data_dirpath.startswith("s3://"):
++            print("Inside s3")
++            s3 = boto3.resource("s3")
++            bucket_name, path_within_bucket = data_dirpath.replace("s3://", "", 1).split("/", 1)
++            print("PATH", path_within_bucket)
++            if not path_within_bucket.endswith("/"):
++                path_within_bucket = f"{path_within_bucket}/"
++            bucket = s3.Bucket(bucket_name)
++            shard_files = [
++                obj.key.replace(path_within_bucket, "", 1)
++                for obj in bucket.objects.filter(Prefix=path_within_bucket)
++                if all(excl not in obj.key for excl in ("/stats/", "global_stats.jsonl"))
++            ]
++        else:
++            # Local filesystem path
++            print("Inside local filesystem")
++            import glob
++
++            shard_files = [
++                os.path.basename(f)
++                for f in glob.glob(os.path.join(data_dirpath, "*.jsonl.gz"))
++                if all(excl not in f for excl in ("/stats/", "global_stats.jsonl"))
++            ]
++    else:
++        raise ValueError("Either shard_list_file or data_dirpath must be provided.")
++
++    if num_shards is not None:
++        shard_files = shard_files[:num_shards]
++
++    if shard_list_filters is not None:
++        shard_files = [s for s in shard_files if any(filt in s for filt in shard_list_filters)]
++
++    # Apply shard_start + shard_count slicing for multi-node parallelism
++    if shard_start or shard_count is not None:
++        if shard_start < 0:
++            raise ValueError("--shard_start must be >= 0")
++        end = None if shard_count is None else shard_start + shard_count
++        shard_files = shard_files[shard_start:end]
++
++    # print("RETURNING", shard_files)
++    return shard_files
++
++
++def process_local_chunk(
++    config_data,
++    raw_data_dirpath,
++    jsonl_relpath,
++    source_name,
++    base_output_path,
++    workers,
++    overwrite,
++    monitor_spec=None,
++    filter_dump_root: Optional[pathlib.Path] = None,
++):
++    try:
++        print("inside process_local_chunk")
++        monitor = build_monitor_from_spec(monitor_spec, jsonl_relpath) if monitor_spec else None
++        recorder = None
++        if filter_dump_root is not None:
++            recorder = build_recorder(filter_dump_root, jsonl_relpath)
++        _, _, pages_in, pages_out = process_single_file(
++            config_data=config_data,
++            raw_data_dirpath=raw_data_dirpath,
++            jsonl_relpath=jsonl_relpath,
++            source_name=source_name,
++            base_output_path=base_output_path,
++            workers=workers,
++            overwrite=overwrite,
++        )
++        return True, pages_in, pages_out
++    except Exception:
++        traceback.print_exc()
++        return False, 0, 0
++
++
++def main():
++    os.environ.setdefault("RAY_LOG_TO_STDERR", "0")
++    args = parse_args()
++
++    json_path = f"exp_data/datasets/untokenized/{args.readable_name}.json"
++
++    # Create parent directories if they don't exist
++    os.makedirs(os.path.dirname(json_path), exist_ok=True)
++
++    if not args.overwrite and os.path.exists(json_path) and not args.skip_dataset_metadata:
++        raise FileExistsError(
++            f"{json_path} already exists. Change --readable_name, delete the file, "
++            "or pass --overwrite (or use --skip_dataset_metadata for multi-node runs)."
++        )
++
++    if args.source_ref_paths is not None:
++        source_ref_paths = [p.strip() for paths in args.source_ref_paths for p in paths.split(",") if p.strip()]
++        source_refs = [get_source_ref(p) for p in source_ref_paths]
++        if len(source_refs) != 1:
++            raise ValueError("For now only one source is supported.")
++        args.raw_data_dirpath = source_refs[0]["dataset_url"]
++    else:
++        source_ref = get_source_ref_by_key(args.raw_data_dirpath, "dataset_url")
++        if source_ref is None:
++            warnings.warn(
++                f"Raw data path '{args.raw_data_dirpath}' not found in dataset references; proceeding without source refs."
++            )
++            source_refs = []
++        else:
++            source_refs = [source_ref]
++
++    config_path = args.config_path
++    output_dir = args.output_dir
++    source_name = args.source_name
++    config_name = os.path.basename(config_path).split(".")[0]
++    base_output_path = os.path.join(output_dir, config_name)
++
++    # Filter IO dump configuration (intermediate snapshots)
++    if args.disable_filter_io_dump:
++        filter_dump_root = None
++        print("Filter IO snapshots are DISABLED; only final per-shard outputs will be written.")
++    else:
++        if args.filter_io_dump_dir:
++            candidate = pathlib.Path(args.filter_io_dump_dir).expanduser()
++            if not candidate.is_absolute():
++                filter_dump_root = pathlib.Path(base_output_path) / candidate
++            else:
++                filter_dump_root = candidate
++        else:
++            filter_dump_root = pathlib.Path(base_output_path) / "filter_snapshots" / args.readable_name
++        filter_dump_root.mkdir(parents=True, exist_ok=True)
++        print(f"Filter IO snapshots will be written to {filter_dump_root}")
++
++    monitor_spec = None
++    if args.monitor_config:
++        with open(args.monitor_config, "r") as monitor_file:
++            monitor_spec = safe_load(monitor_file) or {}
++        output_override = monitor_spec.get("output_dir")
++        if not output_override:
++            output_override = os.path.join(base_output_path, "monitoring")
++        monitor_spec["output_dir"] = str(pathlib.Path(output_override).resolve())
++
++    with open(config_path, "r") as yaml_file:
++        config_data = safe_load(yaml_file)
++        config_data = {v["source"]: v for v in config_data}
++    source_data = config_data[source_name]
++    steps = source_data["steps"]
++
++    chunks = []
++    prev_step_global = True
++    for step in steps:
++        if "func" in step and step["func"] in GLOBAL_FUNCTIONS:
++            if not chunks:
++                raise RuntimeError("Using a global operation as the first step is not currently supported.")
++            chunks.append(step)
++            prev_step_global = True
++        else:
++            if prev_step_global:
++                chunks.append(LOCAL_CHUNK)
++            prev_step_global = False
++
++    true_start = time.time()
++    working_dir = args.raw_data_dirpath
++    overwrite = args.overwrite
++    shard_extension: Optional[str] = None
++    for idx, chunk in enumerate(chunks):
++        chunk_start = time.time()
++        step_name = LOCAL_CHUNK if chunk == LOCAL_CHUNK else chunk["func"]
++
++        shard_files = list_shard_files(
++            working_dir,
++            args.num_shards,
++            args.shard_list_file,
++            args.shard_list_filters,
++            shard_start=args.shard_start,
++            shard_count=args.shard_count,
++        )
++        # print("HERE", shard_files)
++        if not shard_files:
++            raise RuntimeError(f"No shards found for working dir '{working_dir}'.")
++        if shard_extension is None:
++            shard_extension = os.path.splitext(shard_files[0])[-1][1:]
++        print(f"Starting chunk {idx} with name {step_name}, # of input jsonls = {len(shard_files)}")
++
++        if chunk == LOCAL_CHUNK:
++            results = []
++            failed_shards = []
++            pages_in = pages_out = 0
++            for jsonl_relpath in tqdm(shard_files, desc=f"Chunk {idx} ({step_name})"):
++                success, shard_pages_in, shard_pages_out = process_local_chunk(
++                    config_data,
++                    working_dir,
++                    jsonl_relpath,
++                    source_name,
++                    base_output_path,
++                    args.workers,
++                    overwrite,
++                    monitor_spec,
++                    filter_dump_root,
++                )
++                results.append((success, shard_pages_in, shard_pages_out))
++                pages_in += shard_pages_in
++                pages_out += shard_pages_out
++                if not success:
++                    failed_shards.append(jsonl_relpath)
++
++            successes = sum(1 for success, _, _ in results if success)
++            failures = len(results) - successes
++
++            # After a local chunk, we read from processed_data/ in the next chunk
++            working_dir = os.path.join(base_output_path, "processed_data/")
++            overwrite = False
++
++            if failures > 0:
++                warnings.warn(
++                    f"Local chunk failed on {failures} shards out of {len(results)}. "
++                    "Re-run this chunk with the same YAML and without --ignore_failures."
++                )
++                if not args.ignore_failures:
++                    raise RuntimeError("Exiting due to local failures.")
++        else:
++            step = chunk
++            kwargs = {k: v for k, v in step.items() if k != "func"}
++            working_dir = GLOBAL_FUNCTIONS[step["func"]](working_dir, shard_files, base_output_path, **kwargs)
++
++            if idx == len(chunks) - 1 and base_output_path != working_dir:
++                print(f"Final sync required back to desired output path: {working_dir} -> {base_output_path}")
++                raise NotImplementedError(
++                    "Non-local final chunk produced results outside base_output_path; handle the sync manually."
++                )
++
++        print(f"Chunk time: {time.time() - chunk_start:.2f}s")
++
++    print(f"Total time: {time.time() - true_start:.2f}s")
++
++    if shard_extension is None:
++        shard_extension = next(
++            (
++                os.path.splitext(ref.get("data_key", ""))[-1][1:] or ref.get("data_key")
++                for ref in source_refs
++                if ref
++            ),
++            None,
++        )
++    if shard_extension is None and (bool(args.raw_data_dirpath) ^ bool(args.shard_list_file)):
++        fallback_root = args.raw_data_dirpath if args.shard_list_file is None else None
++        shard_files = list_shard_files(
++            fallback_root,
++            num_shards=1,
++            shard_list_file=args.shard_list_file,
++            shard_list_filters=args.shard_list_filters,
++            shard_start=0,
++            shard_count=None,
++        )
++        if shard_files:
++            shard_extension = os.path.splitext(shard_files[0])[-1][1:]
++    if shard_extension is None:
++        raise RuntimeError(
++            "Unable to determine shard extension for dataset metadata. "
++            "Provide source refs with a data_key or rerun without skipping all chunks."
++        )
++
++    # Optionally skip metadata writing (useful for multi-node shard range runs)
++    if not args.skip_dataset_metadata:
++        dataset_json = generate_untokenized_dataset_json(
++            args, source_refs, base_output_path, data_key=shard_extension
++        )
++        with open(json_path, "w") as ref_file:
++            json.dump(dataset_json, ref_file, indent=4)
++    else:
++        print("Skipping dataset metadata JSON (exp_data/datasets/untokenized/...).")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/ray_processing/tokenize_shuffle.py b/ray_processing/tokenize_shuffle.py
+index 6a029d7..bfb9bab 100644
+--- a/ray_processing/tokenize_shuffle.py
++++ b/ray_processing/tokenize_shuffle.py
+@@ -102,9 +102,9 @@ def main(args, dcnlp_arg_names):
+     dataset_json = generate_tokenized_dataset_json(args, source_refs)
+     with open(json_path, "w") as ref_file:
+         json.dump(dataset_json, ref_file, indent=4)
+-    out_json_path = f"{args.output}/{pathlib.Path(args.output).name}.json"
++    out_json_path = f"{args.output.rstrip('/')}/{pathlib.Path(args.output).name}.json"
+     print(f"moving dataset json to {out_json_path}")
+-    os.system(f"aws s3 cp {json_path} {out_json_path}")
++    os.system(f"cp {json_path} {out_json_path}")
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/ray_processing/utils.py b/ray_processing/utils.py
+index f835848..3d3796b 100644
+--- a/ray_processing/utils.py
++++ b/ray_processing/utils.py
+@@ -1,14 +1,14 @@
++import glob
+ import json
+-import yaml
+-from datetime import datetime
+-import uuid
+ import os
+-import git
++import pathlib
++import uuid
++from datetime import datetime
++
+ import boto3
+-import json
++import git
++import yaml
+ from cloudpathlib import S3Path
+-import glob
+-import pathlib
+ 
+ DATASET_REFS_DIR = os.path.join(
+     pathlib.Path(__file__).parent.parent.absolute(),
+@@ -32,7 +32,11 @@ def get_source_ref(source_ref_path):
+ 
+ 
+ def count_tokens(manifest_url, seqlen=2049):
+-    with S3Path(manifest_url).open("r") as f:
++    with (
++        S3Path(manifest_url).open("r")
++        if manifest_url.startswith("s3://")
++        else open(manifest_url, "r")
++    ) as f:
+         manifest = [json.loads(line) for line in f]
+     num_tokens = sum(int(line["num_sequences"]) for line in manifest) * seqlen
+     return num_tokens
+@@ -57,6 +61,14 @@ def generate_untokenized_dataset_json(args, source_refs, base_output_path, data_
+     sources = [{"uuid": s["uuid"], "name": s["name"]} for s in source_refs] if source_refs else []
+     dcnlp_commit_hash, dcnlp_diff = get_git_info()
+ 
++    if args.output_dir.startswith("s3://"):
++        size = get_s3_dir_size(args.output_dir)
++    else:
++        size = sum(
++            os.path.getsize(f)
++            for f in glob.glob(f"{args.output_dir}/**/*{data_key}", recursive=True)
++        )
++
+     dataset_json = {
+         "uuid": str(uuid.uuid4().__str__()),
+         "name": args.readable_name,
+@@ -67,7 +79,7 @@ def generate_untokenized_dataset_json(args, source_refs, base_output_path, data_
+         "tokenized": False,
+         "tokenizer": None,
+         "num_tokens": None,
+-        "size": get_s3_dir_size(args.output_dir),
++        "size": size,
+         "dcnlp_commit_hash": dcnlp_commit_hash,
+         "dcnlp_diff": dcnlp_diff,
+         "data_key": data_key,
+@@ -82,6 +94,13 @@ def generate_tokenized_dataset_json(args, source_refs, data_key="json.gz"):
+     dcnlp_commit_hash, dcnlp_diff = get_git_info()
+     sources = [{"uuid": s["uuid"], "name": s["name"]} for s in source_refs] if source_refs else []
+ 
++    if args.output.startswith("s3://"):
++        size = get_s3_dir_size(args.output)
++    else:
++        size = sum(
++            os.path.getsize(f) for f in glob.glob(f"{args.output}/**/*", recursive=True)
++        )
++
+     # TODO: Currently I just dump the entire yaml, is this the best thing to do?
+     # Also, maybe would be nice to support automated generation of this yaml given input sources + weights
+     sampling_yaml = None
+@@ -99,7 +118,7 @@ def generate_tokenized_dataset_json(args, source_refs, data_key="json.gz"):
+         "tokenized": True,
+         "tokenizer": args.tokenizer,
+         "num_tokens": count_tokens(manifest_url, args.seqlen + 1),
+-        "size": get_s3_dir_size(args.output),
++        "size": size,
+         "dcnlp_commit_hash": dcnlp_commit_hash,
+         "dcnlp_diff": dcnlp_diff,
+         "data_key": data_key,
+diff --git a/requirements.txt b/requirements.txt
+index aa98af0..62957e7 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -17,6 +17,7 @@ langdetect
+ retrie
+ https://github.com/kpu/kenlm/archive/master.zip
+ justext
++resiliparse
+ lxml
+ cloudpathlib
+ boto3
+diff --git a/training/params.py b/training/params.py
+index 9b92353..baf202e 100644
+--- a/training/params.py
++++ b/training/params.py
+@@ -208,6 +208,16 @@ def add_dcnlp_args(parser):
+         default=0,
+         help="This is the maximum number of failed checkpoints (due to not having seen enough tokens) that are allowed",
+     )
++    parser.add_argument(
++        "--ignore-parse-errors",
++        action="store_true",
++        help="Forward open_lm's --ignore-parse-errors so webdataset skips decode errors instead of crashing.",
++    )
++    parser.add_argument(
++        "--dataset-resampled",
++        action="store_true",
++        help="Forward open_lm's --dataset-resampled (sample shards with replacement).",
++    )
+ 
+ 
+ def parse_dcnlp_args():
+@@ -285,7 +295,7 @@ def get_open_lm_args(args, hparams, dr):
+         f"{hparams.acc}",
+         "--model-norm",
+         hparams.norm,
+-        "--delete-previous-checkpoint",
++        # "--delete-previous-checkpoint",
+         "--lr-cooldown-end",
+         f"{hparams.cd}",
+         "--logs",
+@@ -307,6 +317,12 @@ def get_open_lm_args(args, hparams, dr):
+     if args.multiple_data_passes:
+         open_lm_args.append("--multiple-data-passes")
+ 
++    if getattr(args, "ignore_parse_errors", False):
++        open_lm_args.append("--ignore-parse-errors")
++
++    if getattr(args, "dataset_resampled", False):
++        open_lm_args.append("--dataset-resampled")
++
+     if args.averagers:
+         open_lm_args.extend(["--averagers", args.averagers])
+         open_lm_args.extend(["--log-avg-model-training-loss", str(args.log_avg_model_training_loss)])

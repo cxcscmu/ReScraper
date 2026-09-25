@@ -1,0 +1,5 @@
+# Teacher environment for the refining teacher (Qwen3.8-27B served with vLLM; data_construction/teacher_refine/).
+# The refiner environment (vLLM 0.11.1 / transformers 4.57) cannot load this model; our runs used a separate
+# environment with the versions below (plus their own torch/CUDA dependencies).
+vllm==0.28.0
+transformers==5.16.1

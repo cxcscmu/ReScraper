@@ -1,0 +1,15 @@
+You are auditing a page filter for language-model pretraining data.
+
+You will see PAGE: the full visible text of one web page as rendered from its HTML, including navigation, menus, footers, ads and other site chrome. Ignore the chrome and judge only the page's own content.
+
+Decide whether this page belongs in a pretraining corpus once its chrome is removed (or once its content is rewritten as clean prose), or whether it should be removed.
+- remove: the page has no value as training text. Examples: spam; pure navigation or link lists; login, error, cookie or placeholder pages; pure ads; product, price or classified listings with no descriptive text; tag clouds; auto-generated or gibberish text.
+- keep: the page carries content a reader can learn something from: facts, explanations, instructions, arguments, stories, discussions or descriptive text. Short, informal or non-academic content still counts if it is informative.
+
+Also rate how much informative content the page has:
+0 = none; 1 = a little (a few informative sentences among listings, ads or boilerplate); 2 = a moderate amount; 3 = substantial.
+
+Judge the content, not its formatting. Do not prefer a page because it is long or short. If the text ends with "[... truncated for length]", the rest of the page was not shown to you.
+
+Reply with only a JSON object:
+{"value": 0|1|2|3, "verdict": "keep|remove", "reason": "<one sentence>"}

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ReScraper Method Figure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #FFFFFF;
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+  }
+  .figure { background: #FFFFFF; padding: 20px; }
+  svg { display: block; width: 100%; height: auto; }
+  /* Headless-Chrome PDF export: zero page margin suppresses the date/title/URL
+     header and footer; the page is sized to hold the whole figure on one sheet. */
+  @page { size: 1800px 1150px; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- Canvas is 1240 units wide and printed at 0.99\linewidth, so 1 unit is about 0.32pt:
+     font-size 19-20 prints at about 6pt, 24 at about 7.7pt, 26 at about 8.3pt. -->
+<div class="figure">
+  <svg viewBox="0 0 1240 684" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#3A3A3F"/>
+      </marker>
+      <marker id="arrGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#9A958A"/>
+      </marker>
+      <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#EF3A47"/>
+      </marker>
+      <marker id="arrGreenB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.6" markerHeight="3.6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#009647"/>
+      </marker>
+      <marker id="arrRedB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.6" markerHeight="3.6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#EF3A47"/>
+      </marker>
+      <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="#009647"/>
+      </marker>
+      <linearGradient id="refg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#EAF2FB"/>
+        <stop offset="100%" stop-color="#D3E3F4"/>
+      </linearGradient>
+    </defs>
+
+    <!-- ══ RAW HTML (feeds both lanes) ══ -->
+    <rect x="10" y="70" width="210" height="140" rx="8" fill="#FFF" stroke="#BFB6A4" stroke-width="1.5"/>
+    <text x="115" y="106" text-anchor="middle" font-size="24" font-weight="700" fill="#17171A">RAW HTML</text>
+    <line x1="24" y1="120" x2="206" y2="120" stroke="#E4DECF" stroke-width="1.2"/>
+    <g font-family="IBM Plex Mono" font-size="19">
+      <text x="26" y="150" fill="#9A958A">&lt;nav&gt;...&lt;/nav&gt;</text>
+      <text x="26" y="174" fill="#009647" font-weight="500">&lt;article&gt;...</text>
+      <text x="26" y="198" fill="#9A958A">&lt;script&gt;...</text>
+    </g>
+
+    <!-- ══ TOP LANE: heuristic scraper + rule-based filters (baseline) ══ -->
+    <path d="M 220 100 L 229 100 L 229 48 L 237 48" stroke="#9A958A" stroke-width="1.8" stroke-dasharray="6 5" fill="none" marker-end="url(#arrGray)"/>
+    <rect x="240" y="10" width="360" height="76" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="420" y="43" text-anchor="middle" font-size="24" font-weight="600" fill="#6B6963">HEURISTIC SCRAPER</text>
+    <text x="420" y="72" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#6B6963">hand-crafted heuristics</text>
+
+    <path d="M 600 48 L 622 48" stroke="#9A958A" stroke-width="1.8" stroke-dasharray="6 5" fill="none" marker-end="url(#arrGray)"/>
+    <rect x="625" y="10" width="350" height="76" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="800" y="43" text-anchor="middle" font-size="24" font-weight="600" fill="#6B6963">RULE-BASED FILTERS</text>
+    <text x="800" y="72" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#6B6963">keep or drop a whole page</text>
+
+    <path d="M 975 48 L 997 48" stroke="#9A958A" stroke-width="1.8" stroke-dasharray="6 5" fill="none" marker-end="url(#arrGray)"/>
+    <rect x="1000" y="10" width="230" height="76" rx="8" fill="#F4F1EA" stroke="#9A958A" stroke-width="1.4"/>
+    <text x="1115" y="42" text-anchor="middle" font-size="22" font-weight="600" fill="#6B6963">FILTERED TEXT</text>
+    <g transform="translate(1020,54)" fill="#9A958A">
+      <rect x="0" y="0" width="190" height="6" rx="2" opacity="0.55"/>
+      <rect x="0" y="11" width="140" height="6" rx="2" opacity="0.45"/>
+    </g>
+
+    <!-- ══ BOTTOM LANE: ReScraper (ours) ══ -->
+    <path d="M 220 182 L 237 182" stroke="#3A3A3F" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <rect x="240" y="104" width="735" height="156" rx="10" fill="url(#refg)" stroke="#043673" stroke-width="1.8"/>
+    <text x="607.5" y="138" text-anchor="middle" fill="#043673">
+      <tspan font-size="26" font-weight="700" letter-spacing="1.5">RESCRAPER</tspan><tspan font-size="24" font-weight="500" font-style="italic" opacity="0.95">  &middot;  a single 0.6B language model</tspan>
+    </text>
+
+    <!-- step 1: EXTRACT (always) -> step 2: one of KEEP / DELETE / EDIT / REWRITE (colors reused below) -->
+    <rect x="265" y="178" width="140" height="38" rx="19" fill="#008F91" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+    <text x="335" y="204" text-anchor="middle" font-size="20" font-weight="700" fill="#FFF" letter-spacing="1.5">EXTRACT</text>
+    <text x="335" y="168" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#043673">always first</text>
+    <text x="335" y="247" text-anchor="middle" font-size="21" fill="#17171A">gets main content</text>
+    <path d="M 409 197 L 420 197" stroke="#043673" stroke-width="2"/>
+    <polygon points="419,190 429,197 419,204" fill="#043673"/>
+
+    <rect x="431" y="146" width="538" height="76" rx="22" fill="rgba(4,54,115,0.15)"/>
+    <text x="700" y="168" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#043673">choose one of four</text>
+    <g font-size="20" font-weight="700" fill="#FFF" letter-spacing="1.5" text-anchor="middle">
+      <rect x="437" y="178" width="124" height="38" rx="19" fill="#009647" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+      <text x="499" y="204">KEEP</text>
+      <rect x="571" y="178" width="124" height="38" rx="19" fill="#EF3A47" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+      <text x="633" y="204">DELETE</text>
+      <rect x="705" y="178" width="124" height="38" rx="19" fill="#FDB515" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+      <text x="767" y="204" fill="#17171A">EDIT</text>
+      <rect x="839" y="178" width="124" height="38" rx="19" fill="#007BC0" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+      <text x="901" y="204">REWRITE</text>
+    </g>
+    <g font-size="21" fill="#17171A" text-anchor="middle">
+      <text x="499" y="247">unchanged</text>
+      <text x="633" y="247">drop page</text>
+      <text x="767" y="247">remove noise</text>
+      <text x="901" y="247">rewrite page</text>
+    </g>
+
+    <path d="M 975 182 L 997 182" stroke="#3A3A3F" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <rect x="1000" y="104" width="230" height="156" rx="8" fill="rgba(4,54,115,0.07)" stroke="#043673" stroke-width="1.8"/>
+    <text x="1115" y="138" text-anchor="middle" font-size="22" font-weight="700" fill="#043673">REFINED TEXT</text>
+    <g transform="translate(1020,160)" fill="#043673">
+      <rect x="0" y="0"  width="190" height="7" rx="2" opacity="0.85"/>
+      <rect x="0" y="13" width="165" height="7" rx="2" opacity="0.7"/>
+      <rect x="0" y="26" width="185" height="7" rx="2" opacity="0.85"/>
+      <rect x="0" y="39" width="140" height="7" rx="2" opacity="0.6"/>
+      <rect x="0" y="52" width="180" height="7" rx="2" opacity="0.8"/>
+      <rect x="0" y="65" width="155" height="7" rx="2" opacity="0.7"/>
+      <rect x="0" y="78" width="175" height="7" rx="2" opacity="0.8"/>
+    </g>
+
+    <g transform="translate(0,24)">
+    <!-- ══ CALLOUT: SFT data construction (three teachers) ══ -->
+    <path d="M 240 236 L 10 262" stroke="#043673" stroke-width="1.6" stroke-dasharray="7 6" fill="none" opacity="0.75"/>
+    <path d="M 975 236 L 1230 262" stroke="#043673" stroke-width="1.6" stroke-dasharray="7 6" fill="none" opacity="0.75"/>
+    <rect x="10" y="262" width="1220" height="394" rx="14" fill="#F3F6FA" stroke="#043673" stroke-width="1.6" stroke-dasharray="7 5"/>
+    <rect x="24" y="274" width="1192" height="36" rx="8" fill="#D3E3F4"/>
+    <text x="42" y="299" font-size="21" font-weight="700" fill="#043673" letter-spacing="2.5">SFT DATA CONSTRUCTION</text>
+
+    <!-- Input: line-numbered rendering, with the removals of both teachers struck through -->
+    <rect x="24" y="322" width="340" height="174" rx="8" fill="#FFF" stroke="#BFB6A4" stroke-width="1.5"/>
+    <text x="194" y="350" text-anchor="middle" font-size="24" font-weight="700" fill="#17171A">INPUT</text>
+    <text x="194" y="374" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#6B6963">line-numbered rendering</text>
+    <line x1="38" y1="386" x2="350" y2="386" stroke="#E4DECF" stroke-width="1.2"/>
+    <g font-family="IBM Plex Mono" font-size="20">
+      <text x="40" y="412" fill="#9A958A">1</text>
+      <text x="40" y="436" fill="#9A958A">2</text>
+      <text x="40" y="460" fill="#9A958A">3</text>
+      <text x="40" y="484" fill="#9A958A">4</text>
+      <text x="68" y="412" fill="#8C8577" text-decoration="line-through">Home | Login</text>
+      <text x="68" y="436" fill="#8C8577" text-decoration="line-through">Buy now!</text>
+      <text x="68" y="460" fill="#17171A" font-weight="600">Photosynthesis</text>
+      <text x="68" y="484" fill="#17171A">Plants make food.<tspan fill="#D99A06" text-decoration="line-through"> Share!</tspan></text>
+    </g>
+
+    <path d="M 364 417 L 389 417" stroke="#3A3A3F" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <!-- Teacher 1: Dripper -> <extract> removals -->
+    <rect x="392" y="322" width="310" height="174" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5"/>
+    <text x="547" y="350" text-anchor="middle" font-size="24" font-weight="700" fill="#17171A">EXTRACTION TEACHER</text>
+    <text x="547" y="374" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#6B6963">structure-based cleaning</text>
+    <line x1="406" y1="386" x2="688" y2="386" stroke="#E4DECF" stroke-width="1.2"/>
+    <rect x="482" y="400" width="130" height="36" rx="18" fill="#008F91"/>
+    <text x="547" y="425" text-anchor="middle" font-size="19" font-weight="700" fill="#FFF" letter-spacing="1.2">EXTRACT</text>
+    <text x="547" y="468" text-anchor="middle" font-size="21" fill="#17171A">drops lines 1-2</text>
+
+    <path d="M 702 417 L 727 417" stroke="#3A3A3F" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <!-- Teacher 2: Qwen3.8-27B -> keep / edit / others; OTHERS (its deletion marker) is split by FineWeb-Edu into rewrite or delete -->
+    <rect x="730" y="322" width="486" height="174" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5"/>
+    <text x="973" y="350" text-anchor="middle" font-size="24" font-weight="700" fill="#17171A">REFINING TEACHER</text>
+    <text x="973" y="374" text-anchor="middle" font-size="22" font-weight="500" font-style="italic" fill="#6B6963">semantics-based cleaning</text>
+    <line x1="744" y1="386" x2="1202" y2="386" stroke="#E4DECF" stroke-width="1.2"/>
+    <rect x="740" y="392" width="140" height="96" rx="8" fill="rgba(0,150,71,0.10)"/>
+    <rect x="885" y="392" width="160" height="96" rx="8" fill="rgba(253,181,21,0.16)"/>
+    <rect x="1050" y="392" width="140" height="96" rx="8" fill="rgba(107,105,99,0.10)"/>
+    <g font-size="19" font-weight="700" fill="#FFF" letter-spacing="1.2" text-anchor="middle">
+      <rect x="755" y="400" width="110" height="36" rx="18" fill="#009647"/>
+      <text x="810" y="425">KEEP</text>
+      <rect x="910" y="400" width="110" height="36" rx="18" fill="#FDB515"/>
+      <text x="965" y="425" fill="#17171A">EDIT</text>
+      <rect x="1058" y="400" width="124" height="36" rx="18" fill="#6B6963"/>
+      <text x="1120" y="425">OTHERS</text>
+    </g>
+    <g font-size="21" fill="#17171A" text-anchor="middle">
+      <text x="810" y="468">no change</text>
+      <text x="965" y="468">drops "Share!"</text>
+    </g>
+
+    <!-- DELETE branch: FineWeb-Edu >= 1 goes to RePro, the rest stays deleted -->
+    <path d="M 1120 436 L 1120 509" stroke="#6B6963" stroke-width="3.5" fill="none"/>
+    <path d="M 1120 508 L 750 508 L 750 523" stroke="#009647" stroke-width="3.5" stroke-linejoin="round" fill="none" marker-end="url(#arrGreenB)"/>
+    <text x="736" y="524" text-anchor="end" font-size="21" font-weight="700" fill="#009647">FineWeb-Edu ≥ 1</text>
+    <path d="M 1120 508 L 1120 523" stroke="#EF3A47" stroke-width="3.5" fill="none" marker-end="url(#arrRedB)"/>
+    <text x="1134" y="524" font-size="21" font-weight="700" fill="#EF3A47">&lt; 1</text>
+
+    <!-- Teacher 3: RePro -> <rewrite> (a second, poorly written educational page that the semantic step deleted) -->
+    <rect x="24" y="528" width="976" height="114" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5"/>
+    <text x="44" y="559" fill="#17171A"><tspan font-size="24" font-weight="700">REWRITING TEACHER</tspan><tspan font-size="22" font-weight="500" font-style="italic" fill="#6B6963">  &middot;  rescuing educational pages</tspan></text>
+    <rect x="44" y="576" width="124" height="32" rx="16" fill="#007BC0"/>
+    <text x="106" y="598" text-anchor="middle" font-size="18" font-weight="700" fill="#FFF" letter-spacing="1.2">REWRITE</text>
+    <line x1="184" y1="568" x2="184" y2="626" stroke="#E4DECF" stroke-width="1.2"/>
+    <g font-family="IBM Plex Mono" font-size="20" fill="#6B6963">
+      <text x="200" y="584">plants need <tspan fill="#EF3A47">LOTS</tspan> of light <tspan fill="#EF3A47">2</tspan></text>
+      <text x="200" y="606">make <tspan fill="#EF3A47">there</tspan> food<tspan fill="#EF3A47">!!</tspan> the <tspan fill="#EF3A47">leafs</tspan></text>
+      <text x="200" y="628">take sun <tspan fill="#EF3A47">n</tspan> turn it <tspan fill="#EF3A47">in2 enrgy!!</tspan></text>
+    </g>
+    <path d="M 578 602 L 616 602" stroke="#3A3A3F" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <g font-family="IBM Plex Mono" font-size="20" fill="#007BC0" font-weight="600">
+      <text x="630" y="584">Plants need plenty of light</text>
+      <text x="630" y="606">to make food. Their leaves</text>
+      <text x="630" y="628">turn sunlight into energy.</text>
+    </g>
+
+    <!-- Pages below the rescue threshold stay deleted -->
+    <rect x="1024" y="528" width="192" height="114" rx="8" fill="#FFF" stroke="#9A958A" stroke-width="1.5"/>
+    <rect x="1058" y="542" width="124" height="34" rx="17" fill="#EF3A47"/>
+    <text x="1120" y="566" text-anchor="middle" font-size="19" font-weight="700" fill="#FFF" letter-spacing="1.2">DELETE</text>
+    <text x="1120" y="604" text-anchor="middle" font-size="21" fill="#17171A">removed from</text>
+    <text x="1120" y="628" text-anchor="middle" font-size="21" fill="#17171A">the corpus</text>
+    </g>
+  </svg>
+</div>
+
+</body>
+</html>

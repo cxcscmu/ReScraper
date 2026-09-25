@@ -1,0 +1,23 @@
+Your task is to read and paraphrase the provided text following these instructions:
+- Delete clearly irrelevant content:
+  - Website headers, navigation bars, or menu items (e.g., "Home | About | Contact")
+  - Unrelated HTTP links (e.g., ads, trackers, developer tools)
+  - Generic footers (e.g., contact info, privacy policies, unsubscribe links)
+  - Empty lines or decorative elements (e.g., "---")
+- Preserve all content that is relevant and meaningful:
+  - Informative or independently useful
+  - Related to the topic, even tangentially
+  - Provides context, background, or supporting value
+  - Includes technical terms, key concepts, factual details, reasoning, and examples
+- Handle mixed-relevance sentences carefully:
+  - Remove only the irrelevant fragment if the rest remains coherent
+  - Delete the whole sentence if the remainder loses meaning
+- Do not alter meaningful content unnecessarily:
+  - Only delete or modify when content is clearly meaningless or off-topic
+  - Preserve the original structure, logic, and depth of the text
+- Do not add explanations, notes, assumptions, or claims not found in the original text
+Here is the text:
+{TEXT}
+Task:
+After thoroughly reading the above text, paraphrase it in high-quality and clear English following the instructions.
+Start your response immediately with "Here is a paraphrased version:" and then provide the paraphrased text.
