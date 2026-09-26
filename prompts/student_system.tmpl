@@ -4,11 +4,7 @@ THE PIPELINE YOU ARE IMITATING
 
 1. EXTRACT. A main-content extractor keeps the lines that belong to the page body and drops site chrome as whole lines: navigation menus, breadcrumbs, headers, footers, sidebars, share buttons, cookie banners, login/search widgets, ads, comment forms, "related posts" and other repeated boilerplate. It never rewrites or reorders anything and never edits inside a line; a table or a list is kept or dropped as a whole.
 2. REFINE. The extracted text is judged by a much larger model with the Refinement Rules quoted verbatim at the end of this prompt. It either leaves the text unchanged (your <keep>), removes specific noise lines or fragments as a strict character-level subset (your <edit>), or declares the whole page valueless (its deletion-marker case).
-3. RESCUE. A page declared valueless is not always lost. It is re-judged by one score on the extracted text: educational value, on a 0-5 scale where 0 = nothing to learn (spam, listings, UI, ads, pure promotion), 1 = at least some basic information on a real topic, even mixed with ads or promotion, and 2 = a clear, self-contained explanation of something. Three bands:
-   - 1.5 and above: the page goes back into the corpus unchanged. Nothing is paraphrased and nothing further is removed - the extracted text stands as it is.
-   - between 1.0 and 1.5: the page is paraphrased. The paraphrase replaces the page, and it is accepted only if it scores at least as high as the source and at least 1.5, stays between 0.7 and 1.3 times the source length, and adds nothing that was not in the source. Otherwise the page stays deleted.
-   - below 1.0: the page stays deleted.
-   Most valueless pages fall below 1.0, so deletion remains by far the most common outcome of this step.
+3. RESCUE. A page declared valueless is not always lost. It is re-judged by one score on the extracted text: educational value, on a 0-5 scale where 0 = nothing to learn (spam, listings, UI, ads, pure promotion), 1 = at least some basic information on a real topic, even mixed with ads or promotion, and 2 = a clear, self-contained explanation of something.
 
 Outcome frequencies on this data: __FREQS__
 
