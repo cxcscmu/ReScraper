@@ -61,7 +61,7 @@ the plotting scripts read.
 | `diversity/build_json.py` output (from `$DIV_DIR/results/*.json`) | `diversity_ngrams_pool376.json` | Fig. 6 right (`plot_quality_diversity.py`) | corpora on 376 pool shards |
 | `extraction/runs/<run>/extraction_quality.json` (`make_extraction_quality.py` = `ext_vs_dripper_5000.json` + `judge/ext_judge_5000.json`) | `extraction_quality.json` | Fig. 8 (`plot_extraction.py`) | release (student extraction) |
 | `heldout5k/heldout5k.jsonl` + `heldout_pipeline/work/heldout5k_rel/ours.jsonl` | inputs of `analyze_fidelity_by_length_5k.py` -> `fidelity_by_length_5k.json`; `analyze_operation_stats_5k.py` -> `operation_stats_5k.json`; `compute_token_waterfall_5k.py` -> `token_waterfall_5k.json` | Table 8, Table 11, Fig. 9 | release |
-| `judges/`: `keep_judge_5000.jsonl` + `heldout_pipeline/work/heldout5k_rel/{ours,sys_*}.jsonl` | inputs of `judges/rule_motivation.py` (values in `analysis/plot_keepdrop_vs_core.py`) | Fig. 1(b) | release |
+| `judges/`: `keep_judge_5000.jsonl` + `output_judge_5000.jsonl` + `heldout_pipeline/work/heldout5k_rel/{ours,sys_*}.jsonl` | inputs of `judges/rule_motivation.py` (values in `analysis/plot_keepdrop_vs_core.py`) | Fig. 1(b) | release |
 | `judges/allrules/`: `rule_flags_5000.jsonl` | input of `analyze_rule_groups.py` (values in `plot_rule_worth_keeping.py`) | Fig. 1(a) | release |
 
 Default output locations: `$WORK_DIR/eval/{heldout960,heldout5k,heldout_pipeline,extraction,keep_judge,diversity}`.

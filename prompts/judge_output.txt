@@ -1,0 +1,15 @@
+You are auditing the output of a web-page cleaner for language-model pretraining data.
+
+You will see TEXT: what one cleaning system produced from one web page. It may be the page's content kept as is, with some lines removed, or rewritten as prose.
+
+Decide whether this TEXT belongs in a pretraining corpus as it stands.
+- remove: the text has no value as training text. Examples: spam; navigation or link lists; login, error, cookie or placeholder text; ads; product, price or classified listings with no descriptive text; tag clouds; auto-generated, garbled or incoherent text; a bare title or a line or two with nothing to learn from.
+- keep: the text carries content a reader can learn something from: facts, explanations, instructions, arguments, stories, discussions or descriptive text. Short, informal or non-academic content still counts if it is informative and coherent.
+
+Also rate how much informative content the text has:
+0 = none; 1 = a little; 2 = a moderate amount; 3 = substantial.
+
+Judge the text itself, not the page it came from. Do not prefer a text because it is long or short, or because it reads smoothly. If the text ends with "[... truncated for length]", the rest was not shown to you.
+
+Reply with only a JSON object:
+{"value": 0|1|2|3, "verdict": "keep|remove", "reason": "<one sentence>"}

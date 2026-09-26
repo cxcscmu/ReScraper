@@ -1,7 +1,8 @@
 # evaluation/judges/
 
-The keep-or-drop judge and the rule flags behind Figure 1 (the motivation figure): (a) the share of the pages each type
-of rule drops that an independent LLM judges worth keeping, (b) keep-drop accuracy of each pipeline against its 1B Core.
+The keep-or-drop judge, the output judge and the rule flags behind Figure 1 (the motivation figure): (a) the share of
+the pages each type of rule drops that an independent LLM judges worth keeping, (b) keep-drop accuracy of each pipeline
+against its 1B Core. The output judge also gives the appendix page-quality check of Figure 6.
 
 ## Keep-or-drop judge (`keep_judge.py`, `keep_judge.sbatch`)
 - `openai/gpt-oss-120b`, system prompt `prompts/judge_keep_or_drop.txt` (verbatim in the appendix), user message
@@ -19,14 +20,25 @@ of rule drops that an independent LLM judges worth keeping, (b) keep-drop accura
 `sbatch keep_judge.sbatch $WORK_DIR/eval/extraction/runs/heldout5k_rel/ext_texts_5000.jsonl $WORK_DIR/eval/keep_judge/keep_judge_5000.jsonl`
 (`analysis/analyze_rule_groups.py` reads `rule_flags_5000.jsonl` from here.)
 
+## Output judge (`output_judge.py`, `output_judge.sbatch`)
+- `openai/gpt-oss-120b`, system prompt `prompts/judge_output.txt` (verbatim in the appendix), user message
+  `"TEXT:\n<<<\n" + text + "\n>>>"`, text = one output a pipeline kept from a held-out page. The judge never sees the
+  source page or any classifier score. Same vLLM settings, truncation and parsing as the keep-or-drop judge.
+- `python output_judge.py build <heldout_pipeline>/work/heldout5k_rel output_judge_in.jsonl` collects every non-empty
+  output of RefinedWeb-rule, FineWeb-rule, ProX-C, UltraX and ReScraper (17,261 texts in our run), then
+  `sbatch output_judge.sbatch output_judge_in.jsonl output_judge_5000.jsonl` (about 0.6 min per 1,000 texts on one
+  96 GB GPU). Output rows `{gid, system, parsed: {value, verdict, reason}, raw, finish_reason, ...}`.
+
 ## Figure 1(b): `rule_motivation.py`
-`python rule_motivation.py heldout5k.jsonl <heldout_pipeline>/work/heldout5k_rel keep_judge_5000.jsonl rule_motivation.json`
+`python rule_motivation.py heldout5k.jsonl <heldout_pipeline>/work/heldout5k_rel keep_judge_5000.jsonl rule_motivation.json output_judge_5000.jsonl`
 (CPU, seconds). Per system (RefinedWeb-rule, FineWeb-rule, ProX-C, UltraX, the teacher cascade, ReScraper with release
-decoding; a page is kept when the system emits non-empty text): TP/FP/FN/TN against the judge, recall = worth-keeping
-pages kept, and TN/(TN+FP) = junk pages dropped; keep-drop accuracy = their mean (our run, % kept / % dropped:
-ReScraper 87.90 / 68.97, UltraX 96.85 / 40.07, RefinedWeb-rule 67.93 / 60.86, ProX-C 94.39 / 32.29, FineWeb-rule
-50.41 / 73.89). Also per drop reason of each rule stack. `analysis/plot_keepdrop_vs_core.py` plots them
-against the 1B Core scores.
+decoding; a page is kept when the system emits non-empty text): TP/FP/FN/TN against the keep-or-drop judge and recall =
+worth-keeping pages kept. With the output judge, the `keepdrop_fig1b` block gives the share of junk pages removed
+(dropped, or kept only as text the output judge rates worth keeping; same rule for every system) and keep-drop accuracy =
+the mean of the two shares (our run, % kept / % removed -> accuracy: ReScraper 87.90 / 83.59 -> 85.7, UltraX
+96.85 / 56.68 -> 76.8, ProX-C 94.39 / 49.44 -> 71.9, RefinedWeb-rule 67.93 / 66.11 -> 67.0, FineWeb-rule
+50.41 / 77.34 -> 63.9). Also per drop reason of each rule stack. `analysis/plot_keepdrop_vs_core.py` plots the
+accuracies against the 1B Core scores.
 
 ## Figure 1(a): rule flags (`allrules/`)
 `sbatch allrules/run.sbatch heldout5k.jsonl <heldout_pipeline>/work/heldout5k_rel keep_judge_5000.jsonl $WORK_DIR/eval/keep_judge`

@@ -100,7 +100,8 @@ Full map with data files and upstream producers: `analysis/README.md`.
 | paper item | produced by |
 |---|---|
 | Fig. 1(a) rule drops judged worth keeping | `evaluation/judges/` (gpt-oss-120b keep-or-drop judge, per-rule flags) -> `analysis/analyze_rule_groups.py`, `plot_rule_worth_keeping.py` |
-| Fig. 1(b) keep-drop accuracy vs. 1B Core | `evaluation/judges/rule_motivation.py` (on `evaluation/heldout_pipeline/` outputs) -> `analysis/plot_keepdrop_vs_core.py` |
+| Fig. 1(b) keep-drop accuracy vs. 1B Core | `evaluation/judges/rule_motivation.py` with the output judge `evaluation/judges/output_judge.py` (on `evaluation/heldout_pipeline/` outputs) -> `analysis/plot_keepdrop_vs_core.py` |
+| Appendix page-quality check of Fig. 6 (LLM judge) | `evaluation/judges/output_judge.py` on the kept outputs of the Fig. 6 pipelines, grouped as in Fig. 6 |
 | Fig. 2 method overview | `analysis/figure_sources/method_overview.html` -> `analysis/export_html_figure.sh` |
 | Table 2 main results (Core, #unique tokens) | `inference/` + `corpus/` (ReScraper), `baselines/` (rule stacks, ProX-C, UltraX), `pretraining/` (`pretrain_400m.sh`, `pretrain_1b.sh`, `core_sheet.sh` / `eval_sheet.py`) |
 | Fig. 3 scraper comparison | `baselines/scrapers/` + `baselines/rule_based/`, `baselines/ultrax/`, `pretraining/` -> `analysis/plot_scraper_comparison.py` |

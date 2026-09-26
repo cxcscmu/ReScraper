@@ -12,6 +12,7 @@ Every prompt used in the paper, verbatim (byte copies of the files the runs read
 | `two_stage_refiner_system.txt` | the two-stage refiner ablation (`ablations/two_stage_refiner/`) | the refinement rules of the teacher prompt, framed for text input |
 | `judge_extraction.txt` | gpt-oss-120b extraction judge (Figure 8, prompt printed in Appendix "Extraction judge") | `evaluation/extraction/` |
 | `judge_keep_or_drop.txt` | gpt-oss-120b keep-or-drop judge (Figure 1) | `evaluation/judges/` |
+| `judge_output.txt` | gpt-oss-120b output judge (Figure 1(b), appendix page-quality check of Figure 6; prompt printed in Appendix "Output judge") | `evaluation/judges/output_judge.py`; user message `"TEXT:\n<<<\n" + kept text + "\n>>>"` |
 
 Dripper's own inference prompt is part of the Dripper (MinerU-HTML) release and is not duplicated here. DataMan and
 FineWeb-Edu are classifiers used with their released heads.
