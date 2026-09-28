@@ -25,11 +25,16 @@ regenerated. The supervision is built from three teachers run in sequence on the
 the raw HTML of the whole DCLM source pool, and the output is deduplicated and tokenized for DCLM pretraining at the
 400M, 1B and 3B scales.
 
+<p align="center">
+  <img src="assets/method.png" width="100%" alt="Overview of ReScraper">
+</p>
+
 ## Contents
 
 - [Pipeline](#pipeline)
 - [Setup](#setup)
 - [Reproducing the released model and corpus](#reproducing-the-released-model-and-corpus)
+- [Citation](#citation)
 - [License](#license)
 
 ## Pipeline
@@ -78,24 +83,89 @@ starts from the same pages. Held-out shards are listed in `$HELDOUT_SHARDS`.
 
 ## Reproducing the released model and corpus
 
-The pipeline runs in seven stages. Each directory's README gives the exact commands, the inputs and outputs, and
-the compute our own runs used.
+All commands assume `source configs/paths.env`. Each directory's README lists inputs, outputs, compute and the
+exact settings of our runs.
 
-1. **Sample the seed pages.** Draw the seed pages for supervision from the source pool
-   (`data_construction/seed_pages/`).
-2. **Extract the main content — teacher 1.** Run Dripper over the pool; its main-content decision becomes the
-   `<extract>` line removals (`data_construction/dripper/`).
-3. **Label the operation — teacher 2.** Qwen3.8-27B, under a strict-subset refinement prompt, assigns `<keep>`,
-   `<edit>` or `<delete>` and produces the edits (`data_construction/teacher_refine/`). `data_construction/base_set/`
-   joins the two teachers on the same rendering into the base training set.
-4. **Rescue deleted pages — teacher 3.** Score the teacher-deleted pages with FineWeb-Edu; those at 1.0 or above are
-   rephrased by RePro 1B and relabelled `<rewrite>` (`data_construction/rescue/`).
-5. **Train the refiner.** Two supervised stages: first all operations, then a rewrite-heavy mixture so the model
-   learns the operation it would otherwise almost never see (`training/`).
-6. **Refine the whole pool.** Apply the trained model to the raw HTML of every source page, then run the post-filter,
-   Bloom-filter deduplication and tokenization (`inference/`, `corpus/`).
-7. **Pretrain and evaluate.** Train 400M, 1B and 3B models on the resulting corpus and score them on DCLM Core
-   (`pretraining/`).
+### Step 1: Sample the seed pages
+
+Draw the pages that supervision is built from, out of the raw-HTML source pool:
+
+```bash
+python data_construction/seed_pages/sample_seed_pages.py 1600000
+```
+
+### Step 2: Extract the main content (teacher 1)
+
+Run Dripper over the pool. Its main-content decision becomes the `<extract>` line removals:
+
+```bash
+sbatch --array=0-161 data_construction/dripper/run_dripper_pool.sbatch
+sbatch --array=0-15  data_construction/dripper/run_convert_text.sbatch
+```
+
+### Step 3: Label the operation (teacher 2)
+
+Qwen3.8-27B, under a strict-subset refinement prompt, chooses `<keep>`, `<edit>` or `<delete>` and produces the
+edits; the base set then joins the two teachers on the same rendering:
+
+```bash
+sbatch data_construction/teacher_refine/label_qwen27b.sbatch
+python data_construction/base_set/select_pages.py $SFT_DIR/base_set/half1
+sbatch data_construction/base_set/join_render.sbatch $SFT_DIR/base_set/half1
+sbatch data_construction/base_set/build_base_set.sbatch $SFT_DIR/base_set/base_set_norw.jsonl \
+       $SFT_DIR/base_set/half1 $SFT_DIR/base_set/half2
+```
+
+### Step 4: Rescue deleted pages (teacher 3)
+
+Score the teacher-deleted pages with FineWeb-Edu; those at 1.0 or above are rephrased by RePro 1B and relabelled
+`<rewrite>`:
+
+```bash
+sbatch --array=0-13 --export=ALL,WORLD=112 data_construction/rescue/rescue_build.sbatch
+sbatch data_construction/rescue/score_edu_pool.sbatch
+sbatch --array=0-3 --export=ALL,WORLD=28 data_construction/rescue/rewrite_pool.sbatch
+```
+
+### Step 5: Train the refiner
+
+Two supervised stages: first all operations, then a rewrite-heavy mixture so the model learns the operation it
+would otherwise almost never see:
+
+```bash
+sbatch training/stage1_chain.sbatch
+sbatch training/stage2_chain.sbatch          # -> $STAGE2_CKPT
+```
+
+### Step 6: Refine the whole pool
+
+Apply the trained model to the raw HTML of every source page, then post-filter, deduplicate and tokenize:
+
+```bash
+sbatch --array=0-27 --export=ALL,WORLD=224,INFER_MODEL_PATH=$STAGE2_CKPT inference/infer_pool.sbatch
+sbatch --dependency=afterany:<array id> corpus/finish_chain.sbatch rescraper $STAGE2_CKPT \
+       $RESCRAPER_ROOT/prompts/student_system_stage2.txt
+```
+
+### Step 7: Pretrain and evaluate
+
+Train on the resulting corpus and score it on DCLM Core:
+
+```bash
+sbatch -J pt1b_rescraper pretraining/pretrain_1b.sh rescraper_norule_noft 29717
+sbatch --dependency=afterok:<pt id> pretraining/eval_packed.sbatch rescraper_norule_noft 1b
+```
+
+## Citation
+
+```bibtex
+@article{yu2026rescraper,
+  title   = {ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining},
+  author  = {Yu, Zichun and Yan, Jiarui and Sanghvi, Shlok and Atri, Nihar and Xiong, Chenyan},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2026}
+}
+```
 
 ## License
 
