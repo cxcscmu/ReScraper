@@ -25,6 +25,13 @@ regenerated. The supervision is built from three teachers run in sequence on the
 the raw HTML of the whole DCLM source pool, and the output is deduplicated and tokenized for DCLM pretraining at the
 400M, 1B and 3B scales.
 
+## Contents
+
+- [Pipeline](#pipeline)
+- [Setup](#setup)
+- [Reproducing the released model and corpus](#reproducing-the-released-model-and-corpus)
+- [License](#license)
+
 ## Pipeline
 
 ```
@@ -71,70 +78,24 @@ starts from the same pages. Held-out shards are listed in `$HELDOUT_SHARDS`.
 
 ## Reproducing the released model and corpus
 
-```bash
-source configs/paths.env
-# teacher 1: Dripper over the pool                               -> data_construction/dripper/README.md
-python data_construction/seed_pages/sample_seed_pages.py 1600000
-sbatch data_construction/teacher_refine/label_qwen27b.sbatch                       # teacher 2
-python data_construction/base_set/select_pages.py $SFT_DIR/base_set/half1          # (+ half2 with PREV_WANTED)
-sbatch data_construction/base_set/join_render.sbatch $SFT_DIR/base_set/half1
-sbatch data_construction/base_set/build_base_set.sbatch $SFT_DIR/base_set/base_set_norw.jsonl \
-       $SFT_DIR/base_set/half1 $SFT_DIR/base_set/half2
-# two-stage refiner over the pool (pool-scale deletion proxy)    -> ablations/two_stage_refiner/
-sbatch --array=0-13 --export=ALL,WORLD=112 data_construction/rescue/rescue_build.sbatch
-sbatch data_construction/rescue/score_edu_pool.sbatch
-sbatch --array=0-3 --export=ALL,WORLD=28 data_construction/rescue/rewrite_pool.sbatch  # teacher 3
-sbatch training/stage1_chain.sbatch
-sbatch training/stage2_chain.sbatch                                                # -> $STAGE2_CKPT
-sbatch --array=0-27 --export=ALL,WORLD=224,INFER_MODEL_PATH=$STAGE2_CKPT inference/infer_pool.sbatch
-sbatch --dependency=afterany:<array> corpus/finish_chain.sbatch rescraper $STAGE2_CKPT \
-       $RESCRAPER_ROOT/prompts/student_system_stage2.txt                            # post-filter, dedup, tokenize
-sbatch -J pt1b_rescraper pretraining/pretrain_1b.sh rescraper_norule_noft 29717
-sbatch --dependency=afterok:<pt> pretraining/eval_packed.sbatch rescraper_norule_noft 1b
-```
+The pipeline runs in seven stages. Each directory's README gives the exact commands, the inputs and outputs, and
+the compute our own runs used.
 
-Each directory's README lists inputs, outputs, compute and the exact settings of our runs.
-
-## Paper figures and tables
-
-Full map with data files and upstream producers: `analysis/README.md`.
-
-| paper item | produced by |
-|---|---|
-| Fig. 1(a) rule drops judged worth keeping | `evaluation/judges/` (gpt-oss-120b keep-or-drop judge, per-rule flags) -> `analysis/analyze_rule_groups.py`, `plot_rule_worth_keeping.py` |
-| Fig. 1(b) keep-drop accuracy vs. 1B Core | `evaluation/judges/rule_motivation.py` with the output judge `evaluation/judges/output_judge.py` (on `evaluation/heldout_pipeline/` outputs) -> `analysis/plot_keepdrop_vs_core.py` |
-| Appendix page-quality check of Fig. 6 (LLM judge) | `evaluation/judges/output_judge.py` on the kept outputs of the Fig. 6 pipelines, grouped as in Fig. 6 |
-| Fig. 2 method overview | `analysis/figure_sources/method_overview.html` -> `analysis/export_html_figure.sh` |
-| Table 2 main results (Core, #unique tokens) | `inference/` + `corpus/` (ReScraper), `baselines/` (rule stacks, ProX-C, UltraX), `pretraining/` (`pretrain_400m.sh`, `pretrain_1b.sh`, `core_sheet.sh` / `eval_sheet.py`) |
-| Fig. 3 scraper comparison | `baselines/scrapers/` + `baselines/rule_based/`, `baselines/ultrax/`, `pretraining/` -> `analysis/plot_scraper_comparison.py` |
-| Table 3 operation ablation | `ablations/operation_ablation/`, `ablations/two_stage_refiner/`, `corpus/`, `pretraining/` |
-| Fig. 4 quality before/after each operation | `evaluation/heldout_pipeline/` (DataMan, FineWeb-Edu) -> `analysis/plot_operation_scores.py` |
-| Fig. 5 operation mix of model-based pipelines | `evaluation/heldout_pipeline/` -> `analysis/plot_operation_mix.py` |
-| Fig. 6 quality by bucket and n-gram diversity | `evaluation/heldout_pipeline/`, `evaluation/diversity/` -> `analysis/plot_quality_diversity.py` |
-| Fig. 7 teacher vs. student operations | `evaluation/heldout_set/`, `evaluation/heldout_pipeline/` -> `analysis/plot_decision_sankey.py` |
-| Fig. 8 extraction F1 and extraction judge | `evaluation/extraction/` -> `analysis/plot_extraction.py` |
-| Table 6 SFT composition | `data_construction/sft_sets/` -> `analysis/count_sft_tags.py`, `analyze_sft_operations.py` |
-| Table 7 GPU hours | `analysis/slurm_gpu_hours.py`, `prorate_gpu_hours.py` |
-| Table 8 fidelity by input length | `analysis/analyze_fidelity_by_length_5k.py` |
-| Fig. 9 token waterfall | `analysis/compute_token_waterfall_5k.py`, `plot_token_waterfall_5k.py` |
-| Table 9 per-stage retention | `inference/postfilter.py` (POSTFILTER_STATS), `analysis/stage_retention_from_logs.py`, `token_retention_sample.py` |
-| Fig. 10 document length | `evaluation/heldout_pipeline/` -> `analysis/plot_length_distribution.py` |
-| Table 11 operation statistics | `analysis/analyze_operation_stats_5k.py` |
-| Appendix prompts | `prompts/` |
-
-## Not included
-
-- Data, checkpoints and logs (published in the repositories linked above), and third-party code: DCLM (upstream commit above plus
-  `pretraining/dclm_patches/`), Dripper / MinerU-HTML, UltraX, ProX, datatrove, open_lm.
-- The launcher/config of the 3B pretraining setting (hyper-parameters in the paper's Table `tab:config`).
-- Full-pool runs of some baselines: C4-rule and FineWeb-rule (only page-level implementations of the same rule
-  stacks are included), the Raw-data row, trafilatura / jusText over the whole pool (page-level runner included),
-  and DataOrchestra (produced with the authors' released system).
-- The exact tagging script and training launcher of the two-stage refiner's 45,610-row SFT set (plain applications of
-  `data_construction/teacher_refine/` and `training/sft_train.py`), the builder of the intermediate file through which
-  the first half of the base set passed (see `data_construction/README.md`), and the builder of the earlier
-  3,161-page staged held-out table that forms rows 0-3,160 of the held-out set (`evaluation/heldout_set/README.md`).
-- See the "Not included" / "Notes" sections of the directory READMEs for smaller gaps.
+1. **Sample the seed pages.** Draw the seed pages for supervision from the source pool
+   (`data_construction/seed_pages/`).
+2. **Extract the main content — teacher 1.** Run Dripper over the pool; its main-content decision becomes the
+   `<extract>` line removals (`data_construction/dripper/`).
+3. **Label the operation — teacher 2.** Qwen3.8-27B, under a strict-subset refinement prompt, assigns `<keep>`,
+   `<edit>` or `<delete>` and produces the edits (`data_construction/teacher_refine/`). `data_construction/base_set/`
+   joins the two teachers on the same rendering into the base training set.
+4. **Rescue deleted pages — teacher 3.** Score the teacher-deleted pages with FineWeb-Edu; those at 1.0 or above are
+   rephrased by RePro 1B and relabelled `<rewrite>` (`data_construction/rescue/`).
+5. **Train the refiner.** Two supervised stages: first all operations, then a rewrite-heavy mixture so the model
+   learns the operation it would otherwise almost never see (`training/`).
+6. **Refine the whole pool.** Apply the trained model to the raw HTML of every source page, then run the post-filter,
+   Bloom-filter deduplication and tokenization (`inference/`, `corpus/`).
+7. **Pretrain and evaluate.** Train 400M, 1B and 3B models on the resulting corpus and score them on DCLM Core
+   (`pretraining/`).
 
 ## License
 
