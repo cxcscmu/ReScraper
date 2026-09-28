@@ -1,7 +1,9 @@
 # ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining
 
-Anonymous code release accompanying the ICLR 2027 submission. The trained model, the refined corpus and the SFT
-data will be released upon acceptance (referred to below as `<HF_ORG>/<MODEL>` and `<HF_ORG>/<DATASET>`).
+Code release for the ReScraper paper.
+
+- Model: [`cx-cmu/ReScraper`](https://huggingface.co/cx-cmu/ReScraper)
+- Data: [`cx-cmu/ReScraper-Data`](https://huggingface.co/datasets/cx-cmu/ReScraper-Data)
 
 ReScraper replaces the heuristic HTML-to-text stack of pretraining pipelines (a rule-based scraper followed by
 rule-based cleaning filters) with one small language model (Qwen3-0.6B). The model reads the visible text of a
@@ -122,7 +124,7 @@ Full map with data files and upstream producers: `analysis/README.md`.
 
 ## Not included
 
-- Data, checkpoints and logs (to be released upon acceptance), and third-party code: DCLM (upstream commit above plus
+- Data, checkpoints and logs (published in the repositories linked above), and third-party code: DCLM (upstream commit above plus
   `pretraining/dclm_patches/`), Dripper / MinerU-HTML, UltraX, ProX, datatrove, open_lm.
 - The launcher/config of the 3B pretraining setting (hyper-parameters in the paper's Table `tab:config`).
 - Full-pool runs of some baselines: C4-rule and FineWeb-rule (only page-level implementations of the same rule

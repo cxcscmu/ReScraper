@@ -1,8 +1,7 @@
 """Figure 1(a): of the pages each type of rule drops, the share worth keeping.
 
 Pages are the 5,000 held-out pages labeled keep or remove by gpt-oss-120b. Merged rule groups come
-from analyze_rule_groups.py on rule_flags_5000.jsonl (released with the <HF_ORG>/<DATASET> dataset
-upon acceptance, under analysis/keep_judge/): a page belongs to a group when either stack drops it
+from analyze_rule_groups.py on rule_flags_5000.jsonl (released with the cx-cmu/ReScraper-Data dataset, under analysis/keep_judge/): a page belongs to a group when either stack drops it
 with a first-failing rule in that group. The numbers below are the printed output of that script.
 
 Save target: $FIG_DIR/rule_worth_keeping.pdf (FIG_DIR defaults to analysis/figures).

@@ -2,7 +2,7 @@
 
 Reads rule_flags_5000.jsonl (one row per held-out page: keep-or-drop judge verdict, ReScraper's
 operation, and the first failing rule of each rule stack; written by the rule-flag step of
-evaluation/judges/, and released under analysis/keep_judge/ of the <HF_ORG>/<DATASET> dataset upon
+evaluation/judges/, and released under analysis/keep_judge/ of the cx-cmu/ReScraper-Data dataset
 acceptance). A page belongs to a
 group when either stack drops it with a first-failing rule in that group, so pages both stacks
 drop for the same kind of reason are counted once. For each group it prints the share of those

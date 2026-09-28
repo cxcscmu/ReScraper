@@ -28,7 +28,7 @@ bash analysis/export_html_figure.sh          # Figure 2 (needs Chrome/Chromium a
   (GPT-NeoX-20B tokenizer for `compute_token_waterfall_5k.py`).
 - The figure data files themselves are not part of the repository; the map below says which upstream step
   produces each one. The per-page judge files `keep_judge_5000.jsonl` and `rule_flags_5000.jsonl` will be released
-  under `analysis/keep_judge/` of the `<HF_ORG>/<DATASET>` dataset upon acceptance.
+  under `analysis/keep_judge/` of the `cx-cmu/ReScraper-Data` dataset.
 
 All scripts are CPU-only. Everything runs in seconds to minutes on a laptop except `count_sft_tags.py` /
 `compare_sft_tags.py` (stream the 1.38M-row Stage-1 set), `analyze_operation_profile.py` (all corpus shards,

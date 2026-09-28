@@ -22,4 +22,4 @@ sbatch --dependency=afterok:<dedup id> corpus/tokenize.sh rescraper
 ```
 
 Released corpus: `rescraper_norule_noft`, 7,436,788,128 GPT-NeoX-20B tokens in 444 webdataset shards (to be
-released upon acceptance as `<HF_ORG>/<DATASET>`). Deduplication removes 6.2% of documents and 9.93% of tokens.
+released as `cx-cmu/ReScraper-Data`). Deduplication removes 6.2% of documents and 9.93% of tokens.
