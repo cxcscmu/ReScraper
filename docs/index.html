@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ReScraper</title>
 <meta name="description" content="ReScraper replaces the heuristic scraper and the rule-based filter stack with a single 0.6B language model that extracts, keeps, edits, deletes, or rewrites each web page.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ReScraper">
+<meta property="og:url" content="https://cxcscmu.github.io/ReScraper/">
+<meta property="og:title" content="ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining">
+<meta property="og:description" content="One 0.6B model replaces the heuristic scraper and the rule-based filter stack, and wins DCLM Core at 400M, 1.4B and 2.8B.">
+<meta property="og:image" content="https://cxcscmu.github.io/ReScraper/assets/figs/keepdrop_vs_core.png">
+<meta property="og:image:alt" content="Keep-drop accuracy against downstream Core score: ReScraper leads every baseline pipeline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining">
+<meta name="twitter:description" content="One 0.6B model replaces the heuristic scraper and the rule-based filter stack, and wins DCLM Core at 400M, 1.4B and 2.8B.">
+<meta name="twitter:image" content="https://cxcscmu.github.io/ReScraper/assets/figs/keepdrop_vs_core.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,12 +101,12 @@
       accuracy, so these mistakes are paid for in pretraining.</p>
     <div class="two match">
       <figure>
-        <img src="assets/figs/rule_worth_keeping.png" alt="Share of pages each rule drops that are judged worth keeping">
-        <figcaption>Share of the pages each rule drops that the judge calls worth keeping.</figcaption>
-      </figure>
-      <figure>
         <img src="assets/figs/keepdrop_vs_core.png" alt="Keep-drop accuracy against downstream Core score">
         <figcaption>Keep–drop accuracy vs. downstream accuracy of 1.4B pretraining.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/figs/rule_worth_keeping.png" alt="Share of pages each rule drops that are judged worth keeping">
+        <figcaption>Share of the pages each rule drops that the judge calls worth keeping.</figcaption>
       </figure>
     </div>
   </div>
