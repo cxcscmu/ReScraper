@@ -1,10 +1,13 @@
 # ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining
 
-Code release for the ReScraper paper.
+**Zichun Yu, Jiarui Yan, Shlok Sanghvi, Nihar Atri, Chenyan Xiong** · Carnegie Mellon University
 
-- Paper: [arXiv:2609.34287](https://arxiv.org/abs/2609.34287)
-- Model: [`cx-cmu/ReScraper`](https://huggingface.co/cx-cmu/ReScraper)
-- Data: [`cx-cmu/ReScraper-Data`](https://huggingface.co/datasets/cx-cmu/ReScraper-Data)
+**[🌐 Project page](https://jerryyan123.github.io/ReScraper-page/) · [📄 Paper](https://arxiv.org/abs/2609.34287) · [🤗 Model](https://huggingface.co/cx-cmu/ReScraper) · [🤗 Data](https://huggingface.co/datasets/cx-cmu/ReScraper-Data) · [Citation](#citation)**
+
+[![arXiv](https://img.shields.io/badge/arXiv-2609.34287-b31b1b.svg)](https://arxiv.org/abs/2609.34287)
+[![model](https://img.shields.io/badge/%F0%9F%A4%97%20model-cx--cmu%2FReScraper-yellow)](https://huggingface.co/cx-cmu/ReScraper)
+[![data](https://img.shields.io/badge/%F0%9F%A4%97%20data-cx--cmu%2FReScraper--Data-yellow)](https://huggingface.co/datasets/cx-cmu/ReScraper-Data)
+[![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 ReScraper replaces the heuristic HTML-to-text stack of pretraining pipelines (a rule-based scraper followed by
 rule-based cleaning filters) with one small language model (Qwen3-0.6B). The model reads the visible text of a
@@ -29,6 +32,10 @@ the raw HTML of the whole DCLM source pool, and the output is deduplicated and t
 <p align="center">
   <img src="assets/method.png" width="100%" alt="Overview of ReScraper">
 </p>
+
+<sub>The [project page](https://jerryyan123.github.io/ReScraper-page/) shows the paper's figures and an
+interactive comparison on 39 held-out pages: the same page as cleaned by RefinedWeb-rule, FineWeb-rule,
+ProX-C, UltraX and ReScraper, side by side.</sub>
 
 ## Contents
 
