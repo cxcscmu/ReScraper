@@ -19,8 +19,10 @@ tools/                scripts that rebuild assets/cases.js
 
 ## Hosting
 
-GitHub Pages serves this folder as is — there is no build step, so a push to `main` republishes the
-page. Paths inside `index.html` are relative, so the same folder also works from any other prefix.
+This folder is the only copy of the page. GitHub Pages serves it as is (branch `main`, folder
+`/docs`, no build step), so editing files here and pushing to `main` republishes
+<https://cxcscmu.github.io/ReScraper/> within a minute or two. Every path inside `index.html` is
+relative, so the folder also works under any other prefix.
 
 ## Links the page points at
 
@@ -31,7 +33,7 @@ page. Paths inside `index.html` are relative, so the same folder also works from
 | Model | <https://huggingface.co/cx-cmu/ReScraper> |
 | Data | <https://huggingface.co/datasets/cx-cmu/ReScraper-Data> |
 
-The review-time mirror is **not** referenced anywhere on the page and must not be touched.
+The review-time anonymous mirror is **not** referenced anywhere on the page and must not be touched.
 
 ## Rebuilding the cases
 
