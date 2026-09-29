@@ -2,7 +2,7 @@
 
 **Zichun Yu\*, Jiarui Yan\*, Shlok Sanghvi, Nihar Atri, Chenyan Xiong** · Language Technologies Institute, Carnegie Mellon University · \*equal contribution
 
-**[🌐 Project page](https://jerryyan123.github.io/ReScraper-page/) · [📄 Paper](https://arxiv.org/abs/2609.34287) · [🤗 Model](https://huggingface.co/cx-cmu/ReScraper) · [🤗 Data](https://huggingface.co/datasets/cx-cmu/ReScraper-Data) · [Citation](#citation)**
+**[🌐 Project page](https://cxcscmu.github.io/ReScraper/) · [📄 Paper](https://arxiv.org/abs/2609.34287) · [🤗 Model](https://huggingface.co/cx-cmu/ReScraper) · [🤗 Data](https://huggingface.co/datasets/cx-cmu/ReScraper-Data) · [Citation](#citation)**
 
 [![arXiv](https://img.shields.io/badge/arXiv-2609.34287-b31b1b.svg)](https://arxiv.org/abs/2609.34287)
 [![model](https://img.shields.io/badge/%F0%9F%A4%97%20model-cx--cmu%2FReScraper-yellow)](https://huggingface.co/cx-cmu/ReScraper)
@@ -33,7 +33,7 @@ the raw HTML of the whole DCLM source pool, and the output is deduplicated and t
   <img src="assets/method.png" width="100%" alt="Overview of ReScraper">
 </p>
 
-<sub>The [project page](https://jerryyan123.github.io/ReScraper-page/) shows the paper's figures and an
+<sub>The [project page](https://cxcscmu.github.io/ReScraper/) shows the paper's figures and an
 interactive comparison on 39 held-out pages: the same page as cleaned by RefinedWeb-rule, FineWeb-rule,
 ProX-C, UltraX and ReScraper, side by side.</sub>
 
