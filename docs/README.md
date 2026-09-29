@@ -14,6 +14,8 @@ assets/cases.js       window.CASES — the 39 cases (663 KB)
 assets/figs/*.png     figures from ../ReScraper-ICLR-2027/figures/*.pdf, rendered with
                       `gs -sDEVICE=png16m -r<dpi>` at whatever dpi puts them at ~2600 px wide
                       (small PDFs need 600-930 dpi; anything less looks soft on a retina screen)
+assets/figs/card.png  1200x630 link-preview card (og:image), built by pasting
+                      keepdrop_vs_core.png + rule_worth_keeping.png side by side
 tools/                scripts that rebuild assets/cases.js
 ```
 
