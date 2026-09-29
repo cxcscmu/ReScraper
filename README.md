@@ -1,6 +1,6 @@
 # ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining
 
-**Zichun Yu, Jiarui Yan, Shlok Sanghvi, Nihar Atri, Chenyan Xiong** · Carnegie Mellon University
+**Zichun Yu\*, Jiarui Yan\*, Shlok Sanghvi, Nihar Atri, Chenyan Xiong** · Language Technologies Institute, Carnegie Mellon University · \*equal contribution
 
 **[🌐 Project page](https://jerryyan123.github.io/ReScraper-page/) · [📄 Paper](https://arxiv.org/abs/2609.34287) · [🤗 Model](https://huggingface.co/cx-cmu/ReScraper) · [🤗 Data](https://huggingface.co/datasets/cx-cmu/ReScraper-Data) · [Citation](#citation)**
 
