@@ -2,6 +2,7 @@
 
 Code release for the ReScraper paper.
 
+- Paper: [arXiv:2609.34287](https://arxiv.org/abs/2609.34287)
 - Model: [`cx-cmu/ReScraper`](https://huggingface.co/cx-cmu/ReScraper)
 - Data: [`cx-cmu/ReScraper-Data`](https://huggingface.co/datasets/cx-cmu/ReScraper-Data)
 
@@ -162,7 +163,7 @@ sbatch --dependency=afterok:<pt id> pretraining/eval_packed.sbatch rescraper_nor
 @article{yu2026rescraper,
   title   = {ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining},
   author  = {Yu, Zichun and Yan, Jiarui and Sanghvi, Shlok and Atri, Nihar and Xiong, Chenyan},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  journal = {arXiv preprint arXiv:2609.34287},
   year    = {2026}
 }
 ```
