@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReScraper</title>
+<meta name="description" content="ReScraper replaces the heuristic scraper and the rule-based filter stack with a single 0.6B language model that extracts, keeps, edits, deletes, or rewrites each web page.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">Re<span>Scraper</span></a>
+    <a class="link" href="#why">Why</a>
+    <a class="link" href="#method">Method</a>
+    <a class="link" href="#results">Results</a>
+    <a class="link" href="#examples">Examples</a>
+    <a class="link" href="#release">Release</a>
+    <span class="sp"></span>
+    <button id="theme" type="button" aria-pressed="false"><span id="theme-ico">☾</span><span id="theme-txt">Dark</span></button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <h1>ReScraper<span class="dot">.</span></h1>
+    <p class="sub">ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM
+      Pretraining</p>
+    <p class="tag">One 0.6B model in place of a heuristic scraper plus dozens of hand-written
+      filters.</p>
+    <p class="authors">Zichun Yu<sup>*</sup> · Jiarui Yan<sup>*</sup> · Shlok Sanghvi · Nihar Atri ·
+      Chenyan Xiong<br>
+      <span class="affil">Language Technologies Institute, Carnegie Mellon University<br>
+        <sup>*</sup>equal contribution</span></p>
+    <div class="links">
+      <a href="https://arxiv.org/abs/2609.34287">Paper · arXiv</a>
+      <a class="ghost" href="https://github.com/cxcscmu/ReScraper">Code</a>
+      <a class="ghost" href="https://huggingface.co/cx-cmu/ReScraper">Model</a>
+      <a class="ghost" href="https://huggingface.co/datasets/cx-cmu/ReScraper-Data">Data</a>
+      <a class="ghost" href="#examples">See it on real pages ↓</a>
+    </div>
+  </div>
+</header>
+
+<section id="short">
+  <div class="wrap">
+    <div class="short">
+      <div class="item">
+        <b>The problem</b>
+        <p>Web text is cleaned by a heuristic scraper plus dozens of rules that mostly keep or drop
+          whole pages. 31–65% of the pages each rule drops are judged worth keeping.</p>
+      </div>
+      <div class="item">
+        <b>The model</b>
+        <p>ReScraper reads the full rendered page, extracts the main content, and then keeps, edits,
+          deletes, or rewrites it — one 0.6B model, one pass, no cascade.</p>
+      </div>
+      <div class="item">
+        <b>The result</b>
+        <p>Pretraining on its output gives the best DCLM Core score at 400M, 1.4B and 2.8B —
+          +3.8–4.7% relative over the strongest baseline at each scale.</p>
+      </div>
+    </div>
+
+    <nav class="toc" aria-label="Contents">
+      <p class="eyebrow">Contents</p>
+      <ol>
+        <li><a href="#why">Why rules fall short</a><span>what a filter stack throws away, and what it costs downstream</span></li>
+        <li><a href="#method">How ReScraper works</a><span>extract first, then keep, edit, delete or rewrite the page</span></li>
+        <li><a href="#results">Results</a><span>Core at three pretraining scales, per-operation and corpus-level analysis</span></li>
+        <li><a href="#examples">Examples</a><span>39 held-out pages, five pipelines, side by side</span></li>
+        <li><a href="#release">Release</a><span>paper, code, model, corpus, citation</span></li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <p class="eyebrow">Why</p>
+    <h2>Hand-written rules throw away good pages</h2>
+    <p class="lead">We labelled 5,000 held-out Common Crawl pages with an LLM judge and asked what
+      each filter rule actually removes. Rules are coarse: they act on whole pages, and the pages
+      they drop are often the ones worth keeping. Keep-or-drop accuracy also tracks downstream
+      accuracy, so these mistakes are paid for in pretraining.</p>
+    <div class="two match">
+      <figure>
+        <img src="assets/figs/rule_worth_keeping.png" alt="Share of pages each rule drops that are judged worth keeping">
+        <figcaption>Share of the pages each rule drops that the judge calls worth keeping.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/figs/keepdrop_vs_core.png" alt="Keep-drop accuracy against downstream Core score">
+        <figcaption>Keep–drop accuracy vs. downstream accuracy of 1.4B pretraining.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <p class="eyebrow">Method</p>
+    <h2>Extract first, then one of four operations</h2>
+    <p class="lead">Every page is rendered with line identifiers and handed to the model in full.
+      ReScraper always extracts the main content first, then commits to a single decision for the
+      page. Supervision comes from three teachers — an extraction teacher, a refining teacher, and a
+      rewriting teacher that rescues informative pages the cascade would delete.</p>
+    <div class="ops">
+      <span class="op extract"><i>&lt;extract&gt;</i><span>pull the main content out of the rendered page</span></span>
+      <span class="op keep"><i>&lt;keep&gt;</i><span>the extraction is already clean</span></span>
+      <span class="op edit"><i>&lt;edit&gt;</i><span>drop noisy lines and spans</span></span>
+      <span class="op delete"><i>&lt;delete&gt;</i><span>the page is not worth training on</span></span>
+      <span class="op rewrite"><i>&lt;rewrite&gt;</i><span>informative but badly written — rewrite it</span></span>
+    </div>
+    <figure>
+      <img src="assets/figs/method.png" alt="ReScraper method overview">
+      <figcaption>One model replaces the scraper and the filter stack; the dashed box shows how the
+        supervised data is built from the three teachers.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <p class="eyebrow">Results</p>
+    <h2>Better data at every pretraining scale</h2>
+    <p class="lead">Same 18.0M-page Common Crawl pool for every method; DCLM Core is the centered
+      accuracy over 22 downstream tasks. All baselines run on resiliparse-scraped text, while
+      ReScraper curates the rendered page directly.</p>
+
+    <div class="tablecard">
+      <table>
+        <thead>
+          <tr><th>Cleaning method</th><th>#Unique tokens</th><th>Core @ 400M</th><th>Core @ 1.4B</th><th>Core @ 2.8B</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Raw text</td><td>17.69B</td><td>0.1330</td><td>0.2254</td><td>0.2804</td></tr>
+          <tr><td>C4-rule</td><td>5.06B</td><td>0.1370</td><td>0.2136</td><td>0.2409</td></tr>
+          <tr><td>RefinedWeb-rule</td><td>7.04B</td><td>0.1257</td><td>0.2534</td><td>0.3006</td></tr>
+          <tr><td>FineWeb-rule</td><td>5.16B</td><td>0.1465</td><td>0.2302</td><td>0.2790</td></tr>
+          <tr><td>ProX-C</td><td>11.80B</td><td>0.1429</td><td>0.2339</td><td>0.2969</td></tr>
+          <tr><td>UltraX</td><td>10.78B</td><td>0.1395</td><td>0.2615</td><td>0.3064</td></tr>
+          <tr><td>DataOrchestra <span style="color:var(--muted)">(multi-agent)</span></td><td>13.60B</td><td>0.1461</td><td>0.2565</td><td>0.3068</td></tr>
+          <tr class="ours"><td>ReScraper (0.6B)</td><td>7.44B</td><td class="best">0.1535</td><td class="best">0.2735</td><td class="best">0.3184</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tnote">Pretrained models: 400M / 1.4B / 2.8B parameters on 8.2B / 28.8B / 55.9B tokens.
+      ReScraper also uses about a third of the GPU hours of its extraction teacher alone.</p>
+
+    <figure>
+      <img src="assets/figs/scraper_comparison.png" alt="Core score per scraper followed by rule-based cleaning, versus ReScraper">
+      <figcaption>Swapping in a better scraper does not close the gap: four scrapers followed by the
+        same rule-based cleaning, plus the model-based cascade, against ReScraper.</figcaption>
+    </figure>
+
+    <div class="two">
+      <figure>
+        <img src="assets/figs/operation_scores.png" alt="Quality scores before and after each operation">
+        <figcaption>Each operation does a different job: delete removes far worse pages, edit lifts
+          DataMan, rewrite lifts both scores.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/figs/operation_mix.png" alt="Share of pages per operation for each model-based pipeline">
+        <figcaption>ReScraper changes pages sparingly — 56% are left unchanged or barely trimmed,
+          more than the other model-based refiners.</figcaption>
+      </figure>
+    </div>
+
+    <figure>
+      <img src="assets/figs/quality_diversity.png" alt="Quality by bucket and n-gram diversity">
+      <figcaption>ReScraper scores highest in every quality bucket — the gain is largest on the
+        poorest pages — while keeping the corpus as diverse as the baselines.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="examples">
+  <div class="wrap">
+    <p class="eyebrow">Examples</p>
+    <h2>The same page, five pipelines</h2>
+    <p class="lead">39 held-out pages, none of them seen in training. The left panel is the rendered
+      page ReScraper reads, with the two rule stacks under it; the right column holds the
+      model-based refiners, ReScraper first. Every baseline starts from the same resiliparse
+      extraction of the page.
+      Rewrite cases were checked for faithfulness: every rewrite shown adds no entity or number that
+      is not on the page.</p>
+
+    <div class="viewer">
+      <div class="bar">
+        <div class="row">
+          <div class="chips" id="chips"></div>
+          <span class="sp" style="margin-left:auto"></span>
+          <button class="nav-btn" id="prev" title="Previous case">←</button>
+          <span class="counter" id="counter"></span>
+          <button class="nav-btn" id="next" title="Next case">→</button>
+        </div>
+        <div class="track" id="track"></div>
+      </div>
+
+      <div class="casehead">
+        <h3 id="c-domain"></h3>
+        <span class="u"><a id="c-url" href="#" target="_blank" rel="noopener"></a></span>
+      </div>
+      <p class="verdict" id="c-verdict"></p>
+
+      <div class="panels">
+        <div class="stack">
+          <p class="colhead">The page, and the rule stacks</p>
+          <div class="panel self" id="p-source"></div>
+          <div class="stack" id="p-rules"></div>
+        </div>
+        <div class="stack">
+          <p class="colhead ours">Model-based refiners</p>
+          <div class="stack" id="p-outputs"></div>
+        </div>
+      </div>
+      <p class="hint">Use ← / → to move between cases. DataMan (1–5) and FineWeb-Edu are quality
+        scores of the text each pipeline kept; the judge verdict is an independent gpt-oss-120b
+        reading of the page.</p>
+    </div>
+  </div>
+</section>
+
+<section id="release">
+  <div class="wrap">
+    <p class="eyebrow">Release</p>
+    <h2>Code, model, corpus</h2>
+    <div class="cards">
+      <div class="card">
+        <b><a href="https://github.com/cxcscmu/ReScraper">cxcscmu/ReScraper</a></b>
+        <p>Code: data construction from the three teachers, two-stage training, pool inference and
+          the executor, plus every baseline and evaluation in the paper.</p>
+      </div>
+      <div class="card">
+        <b><a href="https://huggingface.co/cx-cmu/ReScraper">cx-cmu/ReScraper</a></b>
+        <p>Model: the 0.6B refiner (Qwen3-0.6B backbone) with both stage prompts.</p>
+      </div>
+      <div class="card">
+        <b><a href="https://huggingface.co/datasets/cx-cmu/ReScraper-Data">cx-cmu/ReScraper-Data</a></b>
+        <p>Data: the 7.44B-token curated corpus, the raw pool output, and both SFT sets.</p>
+      </div>
+    </div>
+    <pre class="bib">@article{yu2026rescraper,
+  title   = {ReScraper: Unified Scraping and Cleaning of Web Data for Effective LLM Pretraining},
+  author  = {Yu, Zichun and Yan, Jiarui and Sanghvi, Shlok and Atri, Nihar and Xiong, Chenyan},
+  journal = {arXiv preprint arXiv:2609.34287},
+  year    = {2026}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Pages shown here come from the DCLM Common Crawl pool and are reproduced for research
+    illustration only. Figures and numbers are from the paper.
+  </div>
+</footer>
+
+<script src="assets/cases.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
