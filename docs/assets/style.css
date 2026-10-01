@@ -166,7 +166,10 @@ figure img {
 figure figcaption { color: var(--muted); font-size: 15px; line-height: 1.55; margin-top: 10px; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 /* a single square plot: keep it about the width of one column of .two */
-figure.solo { max-width: 460px; margin: 22px auto 0; }
+figure.solo { max-width: 340px; margin: 22px auto 0; }
+/* subheads above each results figure */
+h3.fighead { font-size: 19px; font-weight: 600; margin: 38px 0 0; }
+h3.fighead + figure, h3.fighead + .two > figure { margin-top: 12px; }
 /* two plots drawn at the same height in the paper: match that height here too */
 .two.match figure { display: flex; flex-direction: column; margin-top: 22px; }
 .two.match figure img { height: clamp(190px, 24vw, 280px); width: auto; max-width: 100%; margin: 0 auto; }

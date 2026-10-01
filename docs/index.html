@@ -165,18 +165,21 @@
     <p class="tnote">Pretrained models: 400M / 1.4B / 2.8B parameters on 8.2B / 28.8B / 55.9B tokens.
       ReScraper also uses about a third of the GPU hours of its extraction teacher alone.</p>
 
+    <h3 class="fighead">Scraper comparison</h3>
     <figure>
       <img src="assets/figs/scraper_comparison.png" alt="Core score per scraper followed by rule-based cleaning, versus ReScraper">
       <figcaption>Swapping in a better scraper does not close the gap: four scrapers followed by the
         same rule-based cleaning, plus the model-based cascade, against ReScraper.</figcaption>
     </figure>
 
+    <h3 class="fighead">Operation ablation</h3>
     <figure class="solo">
       <img src="assets/figs/ablation_1b.png" alt="Downstream accuracy at 1.4B when each operation of ReScraper is removed">
       <figcaption>Ablation at 1.4B: removing any single operation lowers downstream accuracy, and
         swapping ReScraper's own extraction for Dripper's also falls short.</figcaption>
     </figure>
 
+    <h3 class="fighead">What each operation does</h3>
     <div class="two">
       <figure>
         <img src="assets/figs/operation_scores.png" alt="Quality scores before and after each operation">
@@ -190,6 +193,7 @@
       </figure>
     </div>
 
+    <h3 class="fighead">Quality and diversity</h3>
     <figure>
       <img src="assets/figs/quality_diversity.png" alt="Quality by bucket and n-gram diversity">
       <figcaption>ReScraper scores highest in every quality bucket — the gain is largest on the
